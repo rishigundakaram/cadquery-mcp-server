@@ -17,14 +17,29 @@ sys.path.append(str(Path(__file__).parent.parent))
 import server
 
 
-def load_expected_results() -> dict[str, Any]:
-    """Load expected results from JSON file."""
-    results_file = Path(__file__).parent / "test_expected_results.json"
-    if not results_file.exists():
-        raise FileNotFoundError(f"Expected results file not found: {results_file}")
+def load_test_cases() -> dict[str, dict[str, str]]:
+    """Load test cases from folder structure."""
+    test_cases_dir = Path(__file__).parent / "test_cases"
+    if not test_cases_dir.exists():
+        raise FileNotFoundError(f"Test cases directory not found: {test_cases_dir}")
 
-    with open(results_file) as f:
-        return json.load(f)
+    test_cases = {}
+    for case_dir in test_cases_dir.iterdir():
+        if not case_dir.is_dir():
+            continue
+            
+        model_file = case_dir / "model.py"
+        criteria_file = case_dir / "criteria.txt"
+        result_file = case_dir / "result.txt"
+        
+        if all(f.exists() for f in [model_file, criteria_file, result_file]):
+            test_cases[case_dir.name] = {
+                "model_path": str(model_file),
+                "criteria": criteria_file.read_text().strip(),
+                "expected": result_file.read_text().strip()
+            }
+    
+    return test_cases
 
 
 def generate_visual_outputs(model_file: Path, output_dir: Path) -> dict[str, str]:
@@ -77,15 +92,16 @@ def generate_visual_outputs(model_file: Path, output_dir: Path) -> dict[str, str
     return outputs
 
 
-def run_single_test(model_file: Path, expected_data: dict[str, Any]) -> dict[str, Any]:
+def run_single_test(test_name: str, test_data: dict[str, str]) -> dict[str, Any]:
     """Run verification on a single test model."""
-    print(f"📝 Testing: {model_file.name}")
+    model_file = Path(test_data["model_path"])
+    print(f"📝 Testing: {test_name}")
 
     # Create output directory for this model
-    model_output_dir = Path(__file__).parent / "test_outputs" / model_file.stem
+    model_output_dir = Path(__file__).parent / "test_outputs" / test_name
 
     # Run the verification
-    result = server.cad_verify(str(model_file), expected_data["criteria"])
+    result = server.cad_verify(test_data["model_path"], test_data["criteria"])
 
     # Generate visual outputs
     print(f"   Generating visual outputs...")
@@ -93,7 +109,7 @@ def run_single_test(model_file: Path, expected_data: dict[str, Any]) -> dict[str
 
     # Check if result matches expectation
     actual_status = result["status"]
-    expected_status = expected_data["expected"]
+    expected_status = test_data["expected"]
 
     is_correct = actual_status == expected_status
 
@@ -106,7 +122,7 @@ def run_single_test(model_file: Path, expected_data: dict[str, Any]) -> dict[str
         print(f"   Details:  {result.get('details', 'N/A')}")
 
     return {
-        "model": model_file.name,
+        "test_name": test_name,
         "expected": expected_status,
         "actual": actual_status,
         "correct": is_correct,
@@ -121,46 +137,56 @@ def run_evaluation() -> dict[str, Any]:
     print("🚀 CAD Verification Evaluation Harness")
     print("=" * 50)
 
-    # Load expected results
+    # Load test cases
     try:
-        expected_results = load_expected_results()
-        print(f"📋 Loaded expectations for {len(expected_results)} models")
+        test_cases = load_test_cases()
+        print(f"📋 Loaded {len(test_cases)} test cases")
     except Exception as e:
-        print(f"❌ Error loading expected results: {e}")
+        print(f"❌ Error loading test cases: {e}")
         return {"error": str(e)}
-
-    # Find test models directory
-    test_models_dir = Path(__file__).parent / "test_models"
-    if not test_models_dir.exists():
-        print(f"❌ Test models directory not found: {test_models_dir}")
-        return {"error": f"Test models directory not found: {test_models_dir}"}
 
     # Run tests
     results = []
     correct_count = 0
     total_count = 0
+    true_positives = 0
+    true_negatives = 0
+    false_positives = 0
+    false_negatives = 0
 
     print("\n🧪 Running Tests:")
     print("-" * 30)
 
-    for model_name, expected_data in expected_results.items():
-        model_file = test_models_dir / model_name
-
-        if not model_file.exists():
-            print(f"⚠️  Model file not found: {model_name}")
-            continue
-
-        test_result = run_single_test(model_file, expected_data)
+    for test_name, test_data in test_cases.items():
+        test_result = run_single_test(test_name, test_data)
         results.append(test_result)
 
         if test_result["correct"]:
             correct_count += 1
+            
+        # Calculate confusion matrix values
+        expected = test_result["expected"]
+        actual = test_result["actual"]
+        
+        if expected == "PASS" and actual == "PASS":
+            true_positives += 1
+        elif expected == "FAIL" and actual == "FAIL":
+            true_negatives += 1
+        elif expected == "FAIL" and actual == "PASS":
+            false_positives += 1
+        elif expected == "PASS" and actual == "FAIL":
+            false_negatives += 1
+            
         total_count += 1
-
         print()  # Empty line for readability
 
     # Calculate metrics
     accuracy = (correct_count / total_count * 100) if total_count > 0 else 0
+    
+    # Calculate precision, recall, F1
+    precision = (true_positives / (true_positives + false_positives)) if (true_positives + false_positives) > 0 else 0
+    recall = (true_positives / (true_positives + false_negatives)) if (true_positives + false_negatives) > 0 else 0
+    f1_score = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0
 
     # Print summary
     print("📊 Evaluation Summary:")
@@ -169,7 +195,18 @@ def run_evaluation() -> dict[str, Any]:
     print(f"Correct:        {correct_count}")
     print(f"Incorrect:      {total_count - correct_count}")
     print(f"Accuracy:       {accuracy:.1f}%")
+    print(f"Precision:      {precision:.3f}")
+    print(f"Recall:         {recall:.3f}")
+    print(f"F1 Score:       {f1_score:.3f}")
     print(f"Visual Outputs: test_outputs/ directory")
+    
+    # Print confusion matrix
+    print("\n📋 Confusion Matrix:")
+    print("=" * 20)
+    print(f"                Predicted")
+    print(f"              PASS  FAIL")
+    print(f"Actual PASS   {true_positives:4d}  {false_negatives:4d}")
+    print(f"       FAIL   {false_positives:4d}  {true_negatives:4d}")
 
     if accuracy == 100:
         print("🎉 Perfect score! All tests passed.")
@@ -182,6 +219,15 @@ def run_evaluation() -> dict[str, Any]:
         "total_tests": total_count,
         "correct": correct_count,
         "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1_score": f1_score,
+        "confusion_matrix": {
+            "true_positives": true_positives,
+            "true_negatives": true_negatives,
+            "false_positives": false_positives,
+            "false_negatives": false_negatives
+        },
         "results": results,
     }
 
