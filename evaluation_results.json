@@ -1,0 +1,112 @@
+{
+  "total_tests": 5,
+  "correct": 5,
+  "accuracy": 100.0,
+  "results": [
+    {
+      "model": "box.py",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_models/box.py",
+        "criteria": "simple box with hole",
+        "details": "Dummy verification - always passes"
+      },
+      "visual_outputs": {
+        "box_top.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/box/box_top.svg",
+        "box_front.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/box/box_front.svg",
+        "box_right.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/box/box_right.svg",
+        "box_iso.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/box/box_iso.svg",
+        "generation_status": "success"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/box"
+    },
+    {
+      "model": "coffee_mug.py",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_models/coffee_mug.py",
+        "criteria": "coffee mug with handle",
+        "details": "Dummy verification - always passes"
+      },
+      "visual_outputs": {
+        "coffee_mug_top.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/coffee_mug/coffee_mug_top.svg",
+        "coffee_mug_front.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/coffee_mug/coffee_mug_front.svg",
+        "coffee_mug_right.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/coffee_mug/coffee_mug_right.svg",
+        "coffee_mug_iso.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/coffee_mug/coffee_mug_iso.svg",
+        "generation_status": "success"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/coffee_mug"
+    },
+    {
+      "model": "donut.py",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_models/donut.py",
+        "criteria": "torus shape",
+        "details": "Dummy verification - always passes"
+      },
+      "visual_outputs": {
+        "donut_top.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/donut/donut_top.svg",
+        "donut_front.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/donut/donut_front.svg",
+        "donut_right.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/donut/donut_right.svg",
+        "donut_iso.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/donut/donut_iso.svg",
+        "generation_status": "success"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/donut"
+    },
+    {
+      "model": "snowman.py",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_models/snowman.py",
+        "criteria": "snowman shape",
+        "details": "Dummy verification - always passes"
+      },
+      "visual_outputs": {
+        "snowman_top.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/snowman/snowman_top.svg",
+        "snowman_front.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/snowman/snowman_front.svg",
+        "snowman_right.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/snowman/snowman_right.svg",
+        "snowman_iso.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/snowman/snowman_iso.svg",
+        "generation_status": "success"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/snowman"
+    },
+    {
+      "model": "simple_cylinder.py",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_models/simple_cylinder.py",
+        "criteria": "simple cylinder",
+        "details": "Dummy verification - always passes"
+      },
+      "visual_outputs": {
+        "simple_cylinder_top.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/simple_cylinder/simple_cylinder_top.svg",
+        "simple_cylinder_front.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/simple_cylinder/simple_cylinder_front.svg",
+        "simple_cylinder_right.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/simple_cylinder/simple_cylinder_right.svg",
+        "simple_cylinder_iso.svg": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/simple_cylinder/simple_cylinder_iso.svg",
+        "generation_status": "success"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/ai-3d-print-2/mcp/test_outputs/simple_cylinder"
+    }
+  ]
+}

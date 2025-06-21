@@ -1,0 +1,22 @@
+{
+  "box.py": {
+    "expected": "PASS",
+    "criteria": "simple box with hole"
+  },
+  "coffee_mug.py": {
+    "expected": "PASS", 
+    "criteria": "coffee mug with handle"
+  },
+  "donut.py": {
+    "expected": "PASS",
+    "criteria": "torus shape"
+  },
+  "snowman.py": {
+    "expected": "PASS",
+    "criteria": "snowman shape"
+  },
+  "simple_cylinder.py": {
+    "expected": "PASS",
+    "criteria": "simple cylinder"
+  }
+}

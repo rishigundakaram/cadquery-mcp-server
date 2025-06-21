@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "cad-verification": {
+      "command": "python",
+      "args": [
+        "/Users/rishigundakaram/Desktop/doodles/ai-3d-print/mcp/server.py"
+      ],
+      "env": {}
+    }
+  }
+}
