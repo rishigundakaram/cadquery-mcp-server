@@ -6,21 +6,26 @@ This directory contains the MCP (Model Context Protocol) server that provides CA
 
 ### Install MCP Dependencies
 ```bash
-cd mcp && pip install -r requirements.txt
+uv sync --extra cad
 ```
 
 ### Test MCP Server Functionality
 ```bash
-python test_server.py
+uv run python tests/test_server.py
 ```
 
 ### Test with MCP Inspector (Interactive)
 ```bash
-mcp dev server.py
+uv run mcp dev server.py
+```
+
+### Run Evaluations
+```bash
+uv run python evaluations/evaluate_verify.py
 ```
 
 ### Configure Claude Desktop
-See `README.md` and `INTEGRATION_GUIDE.md` for complete Claude Desktop integration instructions.
+See `README.md` for complete Claude Desktop integration instructions.
 
 ## MCP Server Features
 
@@ -28,8 +33,8 @@ The current implementation includes:
 - **Comprehensive logging**: All verification requests logged to `mcp/mcp_server.log`
 - **File validation**: Checks file existence and Python file type
 - **Detailed error handling**: Descriptive error messages for debugging  
-- **Test suite**: `mcp/test_server.py` for automated testing
-- **Integration guides**: Complete setup documentation in `mcp/` directory
+- **Test suite**: `tests/test_server.py` for automated testing
+- **Evaluation harness**: `evaluations/` directory with test models and verification scripts
 
 ## MCP Server Status
 
@@ -49,7 +54,7 @@ The server provides a `cad_verify` tool with two parameters:
 **Example usage:**
 ```
 cad_verify(
-    file_path="examples/coffee_mug.py",
+    file_path="evaluations/test_models/coffee_mug.py",
     verification_criteria="coffee mug with handle, 10cm height, 8cm diameter"
 )
 ```

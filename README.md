@@ -14,13 +14,16 @@ A Model Context Protocol (MCP) server that provides CAD generation and verificat
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+uv sync
+
+# For development with CAD verification capabilities
+uv sync --extra cad
 
 # Test the server
-python test_server.py
+uv run python tests/test_server.py
 
 # Run with MCP Inspector (interactive testing)
-mcp dev server.py
+uv run mcp dev server.py
 ```
 
 ## Claude Desktop Configuration
@@ -94,10 +97,13 @@ show_object(result)  # Required for processing
 ### Testing
 ```bash
 # Test server functionality
-python test_server.py
+uv run python tests/test_server.py
 
 # Interactive testing with MCP Inspector
-mcp dev server.py
+uv run mcp dev server.py
+
+# Run evaluations
+uv run python evaluations/evaluate_verify.py
 ```
 
 ### Extending the Server
