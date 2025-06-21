@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 # Import the server module
+sys.path.append(str(Path(__file__).parent.parent))
 import server
 
 
@@ -81,8 +82,7 @@ def run_single_test(model_file: Path, expected_data: dict[str, Any]) -> dict[str
     print(f"📝 Testing: {model_file.name}")
 
     # Create output directory for this model
-    test_outputs_dir = Path(__file__).parent / "test_outputs"
-    model_output_dir = test_outputs_dir / model_file.stem
+    model_output_dir = Path(__file__).parent / "test_outputs" / model_file.stem
 
     # Run the verification
     result = server.cad_verify(str(model_file), expected_data["criteria"])

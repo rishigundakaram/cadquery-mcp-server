@@ -17,6 +17,7 @@ def test_server_basic():
     
     try:
         # Test server import
+        sys.path.append(str(Path(__file__).parent.parent))
         import server
         print("✅ Server imports successfully")
         
@@ -46,6 +47,7 @@ show_object(result)
         print(f"✅ Created test file: {test_file}")
         
         # Test verification
+        sys.path.append(str(Path(__file__).parent.parent))
         import server
         result = server.cad_verify(str(test_file), "simple 10x10x10 box")
         print(f"✅ Verification result: {json.dumps(result, indent=2)}")
@@ -91,7 +93,7 @@ def test_claude_desktop_config():
     print("\n🧪 Generating Claude Desktop configuration...")
     
     try:
-        server_path = Path(__file__).parent / "server.py"
+        server_path = Path(__file__).parent.parent / "server.py"
         abs_server_path = server_path.resolve()
         
         config = {
@@ -122,14 +124,14 @@ def main():
     """Run all tests"""
     print("🚀 CAD Verification MCP Server Tests\n")
     
-    # Change to mcp directory
-    mcp_dir = Path(__file__).parent
+    # Change to project root directory
+    project_dir = Path(__file__).parent.parent
     original_dir = Path.cwd()
     
     try:
         import os
-        os.chdir(mcp_dir)
-        print(f"📁 Working directory: {mcp_dir}")
+        os.chdir(project_dir)
+        print(f"📁 Working directory: {project_dir}")
         
         tests = [
             test_server_basic,
