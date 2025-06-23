@@ -53,8 +53,7 @@ def load_model():
         logger.error(f"Failed to load model: {e}")
         return False
 
-# Load model at startup
-load_model()
+# Model will be loaded lazily when first needed
 
 
 @mcp.tool()
@@ -101,42 +100,44 @@ def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, An
 
 
 @mcp.tool()
-def generate_cad_query(description: str, parameters: str = "") -> dict[str, Any]:
+def generate_cad_query(description: str) -> dict[str, Any]:
     """
     Generate CAD-Query Python script from natural language description.
 
     Uses the ricemonster/codegpt-small-sft model to generate CAD-Query code
-    from natural language descriptions.
+    from natural language descriptions. The generated code may not be valid
+    but can be used to edit the original file.
+
+    Example prompt formats (specify spatial units):
+    - "The design features a cube with smooth edges and flat faces. It measures 0.5734 units in length, 0.6253 units in width, and 0.3000 units in height."
+    - "The design consists of a rectangular block and a cylindrical object. The block has a length of about 0.75, a width of 0.375, and a height of 0.125. The cylinder, which is hollow, has a length and width of about 0.375 and a height of 0.21875. These parts are joined together to form the final shape."
+    - "The design features a rectangular prism with a series of indented and protruding sections. The final part measures 0.75 units in length, 0.375 units in width, and 0.0625 units in height."
+    - "This design features a small rectangular box with rounded edges and two circular holes on one face. The box measures roughly 0.75 units long, 0.234 units wide, and 0.0703 units tall."
 
     Args:
         description: Natural language description of the desired 3D model
-        parameters: Optional specific dimensions or constraints
 
     Returns:
         Dict containing generated script and status
     """
     logger.info("🔧 MCP Tool Called: generate_cad_query")
     logger.info(f"📝 Description: {description}")
-    logger.info(f"📏 Parameters: {parameters}")
 
-    # Check if model is loaded
+    # Load model if not already loaded
     if model is None or tokenizer is None:
-        logger.error("Model not loaded")
-        return {
-            "status": "ERROR",
-            "message": "Model not loaded. Please check server logs.",
-            "description": description,
-            "parameters": parameters,
-            "generated_code": None
-        }
+        logger.info("Loading model on first use...")
+        if not load_model():
+            logger.error("Failed to load model")
+            return {
+                "status": "ERROR",
+                "message": "Failed to load model. Please check server logs.",
+                "description": description,
+                "generated_code": None
+            }
 
     try:
         # Create prompt for CAD-Query code generation
-        full_description = f"{description}"
-        if parameters:
-            full_description += f" with parameters: {parameters}"
-
-        prompt = f"""# Generate CAD-Query Python code for: {full_description}
+        prompt = f"""# Generate CAD-Query Python code for: {description}
 # Import cadquery and create the 3D model
 import cadquery as cq
 
@@ -167,7 +168,6 @@ result = """
             "status": "SUCCESS",
             "message": "CAD code generated successfully",
             "description": description,
-            "parameters": parameters,
             "generated_code": generated_code
         }
 
@@ -180,7 +180,6 @@ result = """
             "status": "ERROR",
             "message": f"Error generating CAD code: {str(e)}",
             "description": description,
-            "parameters": parameters,
             "generated_code": None
         }
 
