@@ -15,6 +15,7 @@ import torch
 from mcp.server.fastmcp import FastMCP
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from src.ai_3d_print.verify_helper import verify_model
+from src.ai_3d_print.models import VerificationResult
 
 # Configure detailed logging for debugging
 log_file = Path(__file__).parent / 'mcp_server.log'
@@ -78,25 +79,32 @@ def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, An
     logger.info(f"📋 Verification criteria: {verification_criteria}")
     
     try:
-        # Use the actual verification implementation with criteria
-        result = verify_model(file_path, verification_criteria)
+        # Use the refactored verification implementation
+        verification_response = verify_model(file_path, verification_criteria)
         
-        # Add the verification criteria to the result
-        result["criteria"] = verification_criteria
+        logger.info(f"✅ Verification result: {verification_response.status.value}")
         
-        logger.info(f"✅ Verification result: {result['status']}")
+        # Convert VerificationResponse to dictionary for MCP compatibility
+        result = {
+            "status": verification_response.status.value,
+            "details": verification_response.details,
+            "file_path": file_path,
+            "criteria": verification_criteria
+        }
+        
+        if verification_response.error_message:
+            result["error_message"] = verification_response.error_message
         
         return result
         
     except Exception as e:
         logger.error(f"❌ Verification failed with exception: {e}")
         return {
-            "status": "FAIL",
-            "message": f"Verification failed due to unexpected error: {e}",
+            "status": VerificationResult.ERROR.value,
+            "details": f"Verification failed due to unexpected error: {e}",
             "file_path": file_path,
             "criteria": verification_criteria,
-            "details": [],
-            "errors": [f"Unexpected error: {e}"]
+            "error_message": str(e)
         }
 
 
