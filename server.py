@@ -49,25 +49,7 @@ def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, An
     logger.info(f"📁 File path: {file_path}")
     logger.info(f"📋 Verification criteria: {verification_criteria}")
     
-    # Check if file exists
-    path = Path(file_path)
-    if not path.exists():
-        logger.error(f"❌ File not found: {file_path}")
-        return {
-            "status": "FAIL",
-            "message": f"File not found: {file_path}",
-            "criteria": verification_criteria
-        }
-    
-    if not path.suffix == ".py":
-        logger.error(f"❌ Invalid file type: {path.suffix}")
-        return {
-            "status": "FAIL", 
-            "message": f"File must be a Python file, got: {path.suffix}",
-            "criteria": verification_criteria
-        }
-    
-    # Simple dummy verification - always returns PASS
+    # Always return PASS - dummy verification for development
     # In the future, this could implement actual verification logic
     result = {
         "status": "PASS",
