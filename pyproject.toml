@@ -24,6 +24,8 @@ classifiers = [
 
 dependencies = [
     "mcp[cli]>=0.1.0",
+    "torch>=2.0.0",
+    "transformers>=4.30.0",
 ]
 
 [project.optional-dependencies]
@@ -106,3 +108,8 @@ warn_unused_ignores = true
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.0",
+]

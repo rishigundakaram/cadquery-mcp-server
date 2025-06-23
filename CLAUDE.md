@@ -38,6 +38,7 @@ The current implementation includes:
 
 ## MCP Server Status
 
+### Verification Tool
 Current verification logic is a **dummy implementation** that always returns `PASS`. This provides the framework for future enhancements:
 - Parse CAD-Query code syntax
 - Execute model generation
@@ -45,8 +46,17 @@ Current verification logic is a **dummy implementation** that always returns `PA
 - Validate specific design criteria
 - Advanced geometric analysis
 
+### Code Generation Tool
+The `generate_cad_query` tool is **fully implemented** using the HuggingFace model `ricemonster/codegpt-small-sft`:
+- Loads GPT-2 based model for code generation
+- Generates CAD-Query Python scripts from natural language descriptions
+- Handles parameters and constraints
+- Returns complete executable CAD scripts
+- Includes comprehensive error handling and logging
+
 ## Tool Usage
 
+### Verification Tool
 The server provides a `verify_cad_query` tool with two parameters:
 - **`file_path`**: Path to the CAD-Query Python file to verify
 - **`verification_criteria`**: Description of what to verify (e.g., "coffee mug with handle, 10cm height, 8cm diameter")
@@ -59,4 +69,22 @@ verify_cad_query(
 )
 ```
 
-The tool returns verification status and details.
+### Code Generation Tool
+The server provides a `generate_cad_query` tool with two parameters:
+- **`description`**: Natural language description of the desired 3D model
+- **`parameters`**: Optional specific dimensions or constraints
+
+**Example usage:**
+```
+generate_cad_query(
+    description="simple box",
+    parameters="10x10x10 mm"
+)
+```
+
+**Returns:**
+- `status`: SUCCESS/ERROR
+- `message`: Status description
+- `generated_code`: Complete CAD-Query Python script
+- `description`: Original description
+- `parameters`: Original parameters
