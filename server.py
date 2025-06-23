@@ -78,8 +78,8 @@ def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, An
     logger.info(f"📋 Verification criteria: {verification_criteria}")
     
     try:
-        # Use the actual verification implementation
-        result = verify_model(file_path)
+        # Use the actual verification implementation with criteria
+        result = verify_model(file_path, verification_criteria)
         
         # Add the verification criteria to the result
         result["criteria"] = verification_criteria

@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Any, Dict
 
 import cadquery as cq
-from cadquery.vis import show
+from .render_svg import generate_svg_views
+from .svg_to_png import convert_svg_views_to_png
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +38,12 @@ def generate_stl(model: cq.Workplane, output_path: Path) -> bool:
 
 def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) -> Dict[str, Any]:
     """
-    Generate PNG views of the CAD model from different angles using CadQuery's native visualization.
+    Generate PNG views of the CAD model from different angles using SVG conversion.
     
-    Args:
+    This method generates SVG views first (which works in headless environments)
+    and then converts them to PNG format for compatibility with vision analysis.
+    
+    Args:  
         model: CAD-Query Workplane object
         output_dir: Directory to save PNG files
         base_name: Base name for the PNG files (without extension)
@@ -49,51 +53,47 @@ def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) ->
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    results = {
+    logger.info(f"Generating PNG views for {base_name} using SVG conversion method")
+    
+    # First, generate SVG views
+    svg_results = generate_svg_views(model, output_dir, base_name)
+    
+    if svg_results["status"] == "error":
+        logger.error("Failed to generate SVG views")
+        return {
+            "status": "error",
+            "files": {},
+            "errors": svg_results["errors"]
+        }
+    
+    # Convert SVG views to PNG
+    png_results = convert_svg_views_to_png(svg_results["files"], output_dir, base_name)
+    
+    # Combine results
+    combined_results = {
         "status": "success",
-        "files": {},
-        "errors": []
+        "files": png_results["files"],
+        "errors": svg_results["errors"] + png_results["errors"]
     }
     
-    # Define the views to generate with their camera parameters
-    views = {
-        "right": {"elevation": 0, "roll": 90, "zoom": 1.5},     # Looking from +X axis
-        "top": {"elevation": 90, "roll": 0, "zoom": 1.5},       # Looking from +Z axis (top down)
-        "down": {"elevation": -90, "roll": 0, "zoom": 1.5},     # Looking from -Z axis (bottom up)
-        "iso": {"elevation": 30, "roll": 45, "zoom": 1.2}       # Isometric view
-    }
+    # Update status based on overall results
+    if combined_results["errors"] and not combined_results["files"]:
+        combined_results["status"] = "error"
+    elif combined_results["errors"]:
+        combined_results["status"] = "partial"
     
-    # Generate each view using CadQuery's native show() function
-    for view_name, view_params in views.items():
-        try:
-            output_file = output_dir / f"{base_name}_{view_name}.png"
-            
-            # Use CadQuery's native show() function with screenshot capability
-            show(
-                model,
-                width=800,
-                height=600,
-                screenshot=str(output_file),
-                zoom=view_params["zoom"],
-                roll=view_params["roll"],
-                elevation=view_params["elevation"],
-                interact=False  # Don't open interactive window
-            )
-            
-            results["files"][view_name] = str(output_file)
-            logger.info(f"Generated {view_name} view: {output_file}")
-            
-        except Exception as e:
-            results["errors"].append(f"Failed to generate {view_name} view: {e}")
-            logger.error(f"Error generating {view_name} view: {e}")
+    # Log results
+    if combined_results["files"]:
+        logger.info(f"Successfully generated {len(combined_results['files'])} PNG views")
+        for view_name, path in combined_results["files"].items():
+            logger.info(f"  {view_name}: {path}")
     
-    # Update status based on results
-    if results["errors"] and not results["files"]:
-        results["status"] = "error"
-    elif results["errors"]:
-        results["status"] = "partial"
+    if combined_results["errors"]:
+        logger.warning(f"Encountered {len(combined_results['errors'])} errors during PNG generation")
+        for error in combined_results["errors"]:
+            logger.warning(f"  {error}")
     
-    return results
+    return combined_results
 
 
 def load_cadquery_model(script_path: Path) -> cq.Workplane:

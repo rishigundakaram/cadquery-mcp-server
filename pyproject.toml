@@ -26,6 +26,8 @@ dependencies = [
     "mcp[cli]>=0.1.0",
     "torch>=2.0.0",
     "transformers>=4.30.0",
+    "requests>=2.31.0",
+    "cairosvg>=2.7.0",
 ]
 
 [project.optional-dependencies]
