@@ -3,7 +3,7 @@
     "cad-verification": {
       "command": "python",
       "args": [
-        "/Users/rishigundakaram/Desktop/doodles/ai-3d-print/mcp/server.py"
+        "/Users/rishigundakaram/Desktop/doodles/3d-print-1/cadquery-mcp-server/server.py"
       ],
       "env": {}
     }

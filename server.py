@@ -30,7 +30,7 @@ mcp = FastMCP("CAD Verification Server")
 
 
 @mcp.tool()
-def cad_verify(file_path: str, verification_criteria: str) -> dict[str, Any]:
+def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, Any]:
     """
     Verify a CAD-Query generated model against specified criteria.
     
@@ -45,29 +45,11 @@ def cad_verify(file_path: str, verification_criteria: str) -> dict[str, Any]:
     Returns:
         Dict containing verification status and details
     """
-    logger.info(f"🔍 MCP Tool Called: cad_verify")
+    logger.info(f"🔍 MCP Tool Called: verify_cad_query")
     logger.info(f"📁 File path: {file_path}")
     logger.info(f"📋 Verification criteria: {verification_criteria}")
     
-    # Check if file exists
-    path = Path(file_path)
-    if not path.exists():
-        logger.error(f"❌ File not found: {file_path}")
-        return {
-            "status": "FAIL",
-            "message": f"File not found: {file_path}",
-            "criteria": verification_criteria
-        }
-    
-    if not path.suffix == ".py":
-        logger.error(f"❌ Invalid file type: {path.suffix}")
-        return {
-            "status": "FAIL", 
-            "message": f"File must be a Python file, got: {path.suffix}",
-            "criteria": verification_criteria
-        }
-    
-    # Simple dummy verification - always returns PASS
+    # Always return PASS - dummy verification for development
     # In the future, this could implement actual verification logic
     result = {
         "status": "PASS",
@@ -78,6 +60,38 @@ def cad_verify(file_path: str, verification_criteria: str) -> dict[str, Any]:
     }
     
     logger.info(f"✅ Verification result: {result['status']}")
+    return result
+
+
+@mcp.tool()
+def generate_cad_query(description: str, parameters: str = "") -> dict[str, Any]:
+    """
+    Generate CAD-Query Python script from natural language description.
+    
+    NOTE: This is currently a stub implementation. Future versions will include
+    actual CAD code generation capabilities.
+    
+    Args:
+        description: Natural language description of the desired 3D model
+        parameters: Optional specific dimensions or constraints
+    
+    Returns:
+        Dict containing generated script path and status
+    """
+    logger.info(f"🔧 MCP Tool Called: generate_cad_query")  
+    logger.info(f"📝 Description: {description}")
+    logger.info(f"📏 Parameters: {parameters}")
+    
+    # Stub implementation - future enhancement
+    result = {
+        "status": "NOT_IMPLEMENTED",
+        "message": "CAD code generation is not yet implemented",
+        "description": description,
+        "parameters": parameters,
+        "details": "This tool is a placeholder for future CAD-Query code generation functionality"
+    }
+    
+    logger.info(f"⚠️  Generation result: {result['status']}")
     return result
 
 

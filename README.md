@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server that provides CAD generation and verificat
 ## Features
 
 - **`verify_cad_query`** - Validates CAD-Query generated models against criteria
-- **`generate_cad_query`** - *(To be implemented)* Generates CAD-Query Python scripts from descriptions
+- **`generate_cad_query`** - *(Stub implementation)* Generates CAD-Query Python scripts from descriptions
 - **CAD-Query Integration** - Full CAD-Query support for parametric 3D modeling
 - **STL/STEP Export** - Direct export to 3D printing and CAD formats
 - **Visual Feedback** - SVG generation for model inspection
@@ -78,9 +78,34 @@ Validates a CAD-Query generated model against specified criteria.
 }
 ```
 
-### `generate_cad_query` *(Planned)*
+### `generate_cad_query` *(Stub Implementation)*
 
-Will generate CAD-Query Python scripts from natural language descriptions.
+Generates CAD-Query Python scripts from natural language descriptions.
+
+**NOTE**: Currently returns a stub response indicating the feature is not yet implemented.
+
+**Parameters:**
+- `description` (string): Natural language description of the desired 3D model
+- `parameters` (string, optional): Specific dimensions or constraints
+
+**Example:**
+```json
+{
+  "description": "Create a coffee mug with a handle, 10cm tall and 8cm diameter",
+  "parameters": "height=100mm, diameter=80mm, handle_width=15mm"
+}
+```
+
+**Returns:**
+```json
+{
+  "status": "NOT_IMPLEMENTED",
+  "message": "CAD code generation is not yet implemented",
+  "description": "Input description",
+  "parameters": "Input parameters",
+  "details": "Additional information"
+}
+```
 
 ## CAD-Query Script Requirements
 

@@ -2,7 +2,7 @@
 """
 Evaluation harness for the CAD verification MCP tool.
 
-This script tests the cad_verify function against a set of test models
+This script tests the verify_cad_query function against a set of test models
 with known expected results to measure verification accuracy.
 """
 
@@ -101,7 +101,7 @@ def run_single_test(test_name: str, test_data: dict[str, str]) -> dict[str, Any]
     model_output_dir = Path(__file__).parent / "test_outputs" / test_name
 
     # Run the verification
-    result = server.cad_verify(test_data["model_path"], test_data["criteria"])
+    result = server.verify_cad_query(test_data["model_path"], test_data["criteria"])
 
     # Generate visual outputs
     print(f"   Generating visual outputs...")
