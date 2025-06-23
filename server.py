@@ -136,15 +136,8 @@ def generate_cad_query(description: str) -> dict[str, Any]:
             }
 
     try:
-        # Create prompt for CAD-Query code generation
-        prompt = f"""# Import cadquery and create the 3D model
-import cadquery as cq
-
-# Create the model
-result = """
-
-        # Tokenize input
-        inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True)
+        # Tokenize input directly from description
+        inputs = tokenizer(description, return_tensors="pt", padding=True, truncation=True)
 
         # Generate code
         with torch.no_grad():
@@ -158,10 +151,7 @@ result = """
             )
 
         # Decode generated text
-        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-        # Extract the generated code part (after the prompt)
-        generated_code = generated_text[len(prompt):].strip()
+        generated_code = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
 
         result = {
             "status": "SUCCESS",
