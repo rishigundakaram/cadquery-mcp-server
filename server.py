@@ -137,8 +137,7 @@ def generate_cad_query(description: str) -> dict[str, Any]:
 
     try:
         # Create prompt for CAD-Query code generation
-        prompt = f"""# Generate CAD-Query Python code for: {description}
-# Import cadquery and create the 3D model
+        prompt = f"""# Import cadquery and create the 3D model
 import cadquery as cq
 
 # Create the model
