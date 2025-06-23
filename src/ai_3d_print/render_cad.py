@@ -1,11 +1,11 @@
 """CAD rendering utilities for generating STL files and PNG views."""
 
 import logging
-import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
 import cadquery as cq
+from cadquery.vis import show
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def generate_stl(model: cq.Workplane, output_path: Path) -> bool:
 
 def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) -> Dict[str, Any]:
     """
-    Generate PNG views of the CAD model from different angles.
+    Generate PNG views of the CAD model from different angles using CadQuery's native visualization.
     
     Args:
         model: CAD-Query Workplane object
@@ -55,99 +55,50 @@ def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) ->
         "errors": []
     }
     
-    # Define the views to generate
+    # Define the views to generate with their camera parameters
     views = {
-        "right": {"dir": (1, 0, 0), "up": (0, 0, 1)},  # Looking from +X axis
-        "top": {"dir": (0, 0, -1), "up": (0, 1, 0)},   # Looking from +Z axis (top down)
-        "down": {"dir": (0, 0, 1), "up": (0, 1, 0)},   # Looking from -Z axis (bottom up)
-        "iso": {"dir": (1, -1, 1), "up": (0, 0, 1)}    # Isometric view
+        "right": {"elevation": 0, "roll": 90, "zoom": 1.5},     # Looking from +X axis
+        "top": {"elevation": 90, "roll": 0, "zoom": 1.5},       # Looking from +Z axis (top down)
+        "down": {"elevation": -90, "roll": 0, "zoom": 1.5},     # Looking from -Z axis (bottom up)
+        "iso": {"elevation": 30, "roll": 45, "zoom": 1.2}       # Isometric view
     }
     
-    try:
-        # Import OCP for rendering (this is used by CadQuery for visualization)
-        from OCP.Quantity import Quantity_Color
-        from OCP.V3d import V3d_View
-        
-        # For each view, we'll try to use CadQuery's built-in export capabilities
-        for view_name, view_config in views.items():
-            try:
-                output_file = output_dir / f"{base_name}_{view_name}.png"
-                
-                # Use CadQuery's export functionality to generate images
-                # Note: This requires a display server or virtual display
-                # For now, we'll create placeholder files and log the attempt
-                
-                # Create a simple visualization using matplotlib if available
-                try:
-                    import matplotlib.pyplot as plt
-                    from mpl_toolkits.mplot3d import Axes3D
-                    import numpy as np
-                    
-                    # Extract vertices from the model for basic visualization
-                    vertices = []
-                    for face in model.faces().vals():
-                        for edge in face.edges():
-                            for vertex in edge.vertices():
-                                pt = vertex.val().Center()
-                                vertices.append([pt.X(), pt.Y(), pt.Z()])
-                    
-                    if vertices:
-                        vertices = np.array(vertices)
-                        
-                        fig = plt.figure(figsize=(8, 6))
-                        ax = fig.add_subplot(111, projection='3d')
-                        
-                        # Plot vertices
-                        ax.scatter(vertices[:, 0], vertices[:, 1], vertices[:, 2], alpha=0.6)
-                        
-                        # Set view angle based on the view configuration
-                        if view_name == "right":
-                            ax.view_init(elev=0, azim=0)
-                        elif view_name == "top":
-                            ax.view_init(elev=90, azim=0)
-                        elif view_name == "down":
-                            ax.view_init(elev=-90, azim=0)
-                        elif view_name == "iso":
-                            ax.view_init(elev=30, azim=45)
-                        
-                        ax.set_xlabel('X')
-                        ax.set_ylabel('Y')
-                        ax.set_zlabel('Z')
-                        ax.set_title(f'{view_name.title()} View')
-                        
-                        plt.savefig(output_file, dpi=150, bbox_inches='tight')
-                        plt.close()
-                        
-                        results["files"][view_name] = str(output_file)
-                        logger.info(f"Generated {view_name} view: {output_file}")
-                        
-                    else:
-                        # Create a placeholder file
-                        output_file.write_text(f"Placeholder for {view_name} view")
-                        results["files"][view_name] = str(output_file)
-                        results["errors"].append(f"No vertices found for {view_name} view")
-                        
-                except ImportError:
-                    # If matplotlib is not available, create placeholder files
-                    output_file.write_text(f"Placeholder PNG for {view_name} view - matplotlib not available")
-                    results["files"][view_name] = str(output_file)
-                    results["errors"].append(f"matplotlib not available for {view_name} view")
-                    
-            except Exception as e:
-                results["errors"].append(f"Failed to generate {view_name} view: {e}")
-                logger.error(f"Error generating {view_name} view: {e}")
-                
-    except Exception as e:
+    # Generate each view using CadQuery's native show() function
+    for view_name, view_params in views.items():
+        try:
+            output_file = output_dir / f"{base_name}_{view_name}.png"
+            
+            # Use CadQuery's native show() function with screenshot capability
+            show(
+                model,
+                width=800,
+                height=600,
+                screenshot=str(output_file),
+                zoom=view_params["zoom"],
+                roll=view_params["roll"],
+                elevation=view_params["elevation"],
+                interact=False  # Don't open interactive window
+            )
+            
+            results["files"][view_name] = str(output_file)
+            logger.info(f"Generated {view_name} view: {output_file}")
+            
+        except Exception as e:
+            results["errors"].append(f"Failed to generate {view_name} view: {e}")
+            logger.error(f"Error generating {view_name} view: {e}")
+    
+    # Update status based on results
+    if results["errors"] and not results["files"]:
         results["status"] = "error"
-        results["errors"].append(f"General rendering error: {e}")
-        logger.error(f"Error in generate_png_views: {e}")
+    elif results["errors"]:
+        results["status"] = "partial"
     
     return results
 
 
-def execute_cadquery_script(script_path: Path) -> cq.Workplane:
+def load_cadquery_model(script_path: Path) -> cq.Workplane:
     """
-    Execute a CAD-Query Python script and return the model.
+    Load a CAD-Query model from a Python script.
     
     Args:
         script_path: Path to the Python script containing CAD-Query code
@@ -172,7 +123,7 @@ def execute_cadquery_script(script_path: Path) -> cq.Workplane:
         shown_objects.append(obj)
         return obj
     
-    # Create a namespace for script execution with CAD-Query and show_object
+    # Create a namespace for script execution
     namespace = {
         "cadquery": cq, 
         "cq": cq,
@@ -180,11 +131,8 @@ def execute_cadquery_script(script_path: Path) -> cq.Workplane:
         "__builtins__": __builtins__
     }
     
-    # Execute the script
-    try:
-        exec(script_content, namespace)
-    except Exception as e:
-        raise Exception(f"Failed to execute CAD-Query script: {e}")
+    # Execute the script - if it fails, the model is invalid
+    exec(script_content, namespace)
     
     # First, check if show_object was called
     if shown_objects:

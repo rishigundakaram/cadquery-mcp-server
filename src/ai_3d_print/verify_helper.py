@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict
 
-from .render_cad import execute_cadquery_script, generate_stl, generate_png_views
+from .render_cad import load_cadquery_model, generate_stl, generate_png_views
 
 logger = logging.getLogger(__name__)
 
@@ -59,14 +59,14 @@ def verify_model(file_path: str) -> Dict[str, Any]:
             result["errors"].append(f"Could not create output directory: {e}")
             return result
         
-        # Execute the CAD-Query script
+        # Load the CAD-Query model
         try:
-            model = execute_cadquery_script(script_path)
-            result["details"].append("Successfully executed CAD-Query script")
+            model = load_cadquery_model(script_path)
+            result["details"].append("Successfully loaded CAD-Query model")
         except Exception as e:
             result["status"] = "FAIL"
-            result["message"] = f"Failed to execute CAD script: {e}"
-            result["errors"].append(f"Script execution error: {e}")
+            result["message"] = f"Failed to load CAD model: {e}"
+            result["errors"].append(f"Model loading error: {e}")
             return result
         
         # Generate STL file
