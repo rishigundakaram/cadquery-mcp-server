@@ -35,89 +35,33 @@ def verify_model(file_path: str) -> Dict[str, Any]:
         # Validate input file
         script_path = Path(file_path)
         if not script_path.exists():
-            result["status"] = "FAIL"
-            result["message"] = f"File not found: {file_path}"
-            result["errors"].append(f"Input file does not exist: {file_path}")
-            return result
+            raise FileNotFoundError(f"Input file does not exist: {file_path}")
             
         if not script_path.suffix.lower() == '.py':
-            result["status"] = "FAIL"
-            result["message"] = f"Invalid file type: {file_path}"
-            result["errors"].append(f"File must be a Python (.py) file: {file_path}")
-            return result
+            raise ValueError(f"File must be a Python (.py) file: {file_path}")
         
         # Create output directory
         file_name = script_path.stem
         outputs_dir = script_path.parent.parent / "outputs" / file_name
+        outputs_dir.mkdir(parents=True, exist_ok=True)
         
-        try:
-            outputs_dir.mkdir(parents=True, exist_ok=True)
-            result["details"].append(f"Created output directory: {outputs_dir}")
-        except Exception as e:
-            result["status"] = "FAIL"
-            result["message"] = f"Failed to create output directory: {e}"
-            result["errors"].append(f"Could not create output directory: {e}")
-            return result
-        
-        # Load the CAD-Query model
-        try:
-            model = load_cadquery_model(script_path)
-            result["details"].append("Successfully loaded CAD-Query model")
-        except Exception as e:
-            result["status"] = "FAIL"
-            result["message"] = f"Failed to load CAD model: {e}"
-            result["errors"].append(f"Model loading error: {e}")
-            return result
+        # Load the CAD-Query model (this will fail if code doesn't compile)
+        model = load_cadquery_model(script_path)
         
         # Generate STL file
         stl_path = outputs_dir / f"{file_name}.stl"
-        try:
-            if generate_stl(model, stl_path):
-                result["outputs"]["stl"] = str(stl_path)
-                result["details"].append(f"Generated STL file: {stl_path}")
-            else:
-                result["errors"].append("Failed to generate STL file")
-        except Exception as e:
-            result["errors"].append(f"STL generation error: {e}")
+        generate_stl(model, stl_path)
+        result["outputs"]["stl"] = str(stl_path)
         
         # Generate PNG views
-        try:
-            png_results = generate_png_views(model, outputs_dir, file_name)
-            result["outputs"]["pngs"] = png_results["files"]
-            
-            if png_results["status"] == "success":
-                result["details"].append(f"Generated {len(png_results['files'])} PNG views")
-            else:
-                result["errors"].extend(png_results.get("errors", []))
-                
-            # Add details about each generated PNG
-            for view_name, png_path in png_results["files"].items():
-                result["details"].append(f"Generated {view_name} view: {png_path}")
-                
-        except Exception as e:
-            result["errors"].append(f"PNG generation error: {e}")
+        png_results = generate_png_views(model, outputs_dir, file_name)
+        result["outputs"]["pngs"] = png_results["files"]
         
-        # Determine final status
-        if result["errors"]:
-            if result["outputs"]["stl"] or result["outputs"]["pngs"]:
-                result["status"] = "PARTIAL"
-                result["message"] = "Verification completed with some errors"
-            else:
-                result["status"] = "FAIL"
-                result["message"] = "Verification failed - no outputs generated"
-        else:
-            result["status"] = "PASS"
-            result["message"] = "CAD model verification completed successfully"
-        
-        # Add summary information
-        stl_count = 1 if result["outputs"]["stl"] else 0
-        png_count = len(result["outputs"]["pngs"])
-        result["details"].append(f"Generated {stl_count} STL file and {png_count} PNG views")
+        return result
         
     except Exception as e:
         result["status"] = "FAIL"
-        result["message"] = f"Unexpected error during verification: {e}"
-        result["errors"].append(f"Unexpected error: {e}")
-        logger.error(f"Unexpected error in verify_model: {e}")
-    
-    return result
+        result["message"] = f"Verification failed: {e}"
+        result["errors"].append(str(e))
+        logger.error(f"Verification failed for {file_path}: {e}")
+        return result
