@@ -14,6 +14,7 @@ from typing import Any
 import torch
 from mcp.server.fastmcp import FastMCP
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from src.ai_3d_print.verify_helper import verify_model
 
 # Configure detailed logging for debugging
 log_file = Path(__file__).parent / 'mcp_server.log'
@@ -60,10 +61,10 @@ load_model()
 def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, Any]:
     """
     Verify a CAD-Query generated model against specified criteria.
-
-    This tool should be called before presenting any CAD model outputs to users
-    to ensure the generated model meets the specified requirements.
-
+    
+    This tool generates STL files and PNG views (right, top, down, iso) of the model
+    and validates it against the specified criteria.
+    
     Args:
         file_path: Path to the CAD-Query Python file to verify
         verification_criteria: Description of what aspects to verify
@@ -75,19 +76,28 @@ def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, An
     logger.info("🔍 MCP Tool Called: verify_cad_query")
     logger.info(f"📁 File path: {file_path}")
     logger.info(f"📋 Verification criteria: {verification_criteria}")
-
-    # Always return PASS - dummy verification for development
-    # In the future, this could implement actual verification logic
-    result = {
-        "status": "PASS",
-        "message": "CAD model verification completed successfully",
-        "file_path": file_path,
-        "criteria": verification_criteria,
-        "details": "Dummy verification - always passes"
-    }
-
-    logger.info(f"✅ Verification result: {result['status']}")
-    return result
+    
+    try:
+        # Use the actual verification implementation
+        result = verify_model(file_path)
+        
+        # Add the verification criteria to the result
+        result["criteria"] = verification_criteria
+        
+        logger.info(f"✅ Verification result: {result['status']}")
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"❌ Verification failed with exception: {e}")
+        return {
+            "status": "FAIL",
+            "message": f"Verification failed due to unexpected error: {e}",
+            "file_path": file_path,
+            "criteria": verification_criteria,
+            "details": [],
+            "errors": [f"Unexpected error: {e}"]
+        }
 
 
 @mcp.tool()
