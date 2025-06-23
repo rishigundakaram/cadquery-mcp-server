@@ -47,13 +47,13 @@ Current verification logic is a **dummy implementation** that always returns `PA
 
 ## Tool Usage
 
-The server provides a `cad_verify` tool with two parameters:
+The server provides a `verify_cad_query` tool with two parameters:
 - **`file_path`**: Path to the CAD-Query Python file to verify
 - **`verification_criteria`**: Description of what to verify (e.g., "coffee mug with handle, 10cm height, 8cm diameter")
 
 **Example usage:**
 ```
-cad_verify(
+verify_cad_query(
     file_path="evaluations/test_models/coffee_mug.py",
     verification_criteria="coffee mug with handle, 10cm height, 8cm diameter"
 )

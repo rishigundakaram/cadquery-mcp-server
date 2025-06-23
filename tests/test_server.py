@@ -2,7 +2,7 @@
 """
 Test script for the CAD Verification MCP Server
 
-This script tests the cad_verify tool functionality and helps debug MCP integration.
+This script tests the verify_cad_query tool functionality and helps debug MCP integration.
 """
 
 import json
@@ -22,8 +22,8 @@ def test_server_basic():
         print("✅ Server imports successfully")
         
         # Test tool function directly
-        result = server.cad_verify("test_file.py", "test criteria")
-        print(f"✅ cad_verify function works: {result}")
+        result = server.verify_cad_query("test_file.py", "test criteria")
+        print(f"✅ verify_cad_query function works: {result}")
         
         return True
     except Exception as e:
@@ -49,7 +49,7 @@ show_object(result)
         # Test verification
         sys.path.append(str(Path(__file__).parent.parent))
         import server
-        result = server.cad_verify(str(test_file), "simple 10x10x10 box")
+        result = server.verify_cad_query(str(test_file), "simple 10x10x10 box")
         print(f"✅ Verification result: {json.dumps(result, indent=2)}")
         
         # Cleanup
@@ -79,7 +79,7 @@ def test_mcp_inspector():
         print(f"✅ MCP CLI found: {result.stdout.strip()}")
         print("\n📋 To test interactively, run:")
         print("   mcp dev server.py")
-        print("\nThen test the cad_verify tool with:")
+        print("\nThen test the verify_cad_query tool with:")
         print('   {"file_path": "examples/box.py", "verification_criteria": "simple box"}')
         
         return True
