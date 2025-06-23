@@ -23,10 +23,6 @@ def verify_model(file_path: str) -> Dict[str, Any]:
         "status": "PASS",
         "message": "CAD model verification completed successfully",
         "file_path": file_path,
-        "outputs": {
-            "stl": None,
-            "pngs": {}
-        },
         "details": [],
         "errors": []
     }
@@ -51,11 +47,9 @@ def verify_model(file_path: str) -> Dict[str, Any]:
         # Generate STL file
         stl_path = outputs_dir / f"{file_name}.stl"
         generate_stl(model, stl_path)
-        result["outputs"]["stl"] = str(stl_path)
         
         # Generate PNG views
         png_results = generate_png_views(model, outputs_dir, file_name)
-        result["outputs"]["pngs"] = png_results["files"]
         
         return result
         
