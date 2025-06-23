@@ -153,22 +153,12 @@ result = """
         # Extract the generated code part (after the prompt)
         generated_code = generated_text[len(prompt):].strip()
 
-        # Create complete script
-        complete_script = f"""import cadquery as cq
-
-# {description}
-result = {generated_code}
-
-# Display the result
-show_object(result)
-"""
-
         result = {
             "status": "SUCCESS",
             "message": "CAD code generated successfully",
             "description": description,
             "parameters": parameters,
-            "generated_code": complete_script
+            "generated_code": generated_code
         }
 
         logger.info(f"✅ Generation result: {result['status']}")
