@@ -100,7 +100,7 @@ def spherical_pose(theta_deg: float, phi_deg: float, radius: float) -> np.ndarra
 def make_scene(mesh: trimesh.Trimesh, camera_pose: np.ndarray, 
                light_intensity: float = 3.0) -> pyrender.Scene:
     """
-    Create a pyrender scene with mesh, camera, and lighting.
+    Create a pyrender scene with mesh, camera, and lighting optimized for LLM vision analysis.
     
     Args:
         mesh: Trimesh object to render
@@ -110,19 +110,57 @@ def make_scene(mesh: trimesh.Trimesh, camera_pose: np.ndarray,
     Returns:
         Configured pyrender scene
     """
-    scene = pyrender.Scene(bg_color=[1.0, 1.0, 1.0, 1.0], ambient_light=[0.1, 0.1, 0.1])
+    # White background for high contrast
+    scene = pyrender.Scene(bg_color=[1.0, 1.0, 1.0, 1.0], ambient_light=[0.3, 0.3, 0.3])
     
-    # Add mesh with smooth shading
-    mesh_node = pyrender.Mesh.from_trimesh(mesh, smooth=True)
+    # Create bright yellow material with good contrast properties
+    material = pyrender.MetallicRoughnessMaterial(
+        baseColorFactor=[1.0, 0.8, 0.0, 1.0],  # Bright yellow
+        metallicFactor=0.0,                     # Not metallic (matte finish)
+        roughnessFactor=0.8,                    # Rough surface (less shiny)
+        emissiveFactor=[0.0, 0.0, 0.0]         # No emission
+    )
+    
+    # Add mesh with custom yellow material
+    mesh_node = pyrender.Mesh.from_trimesh(mesh, material=material, smooth=True)
     scene.add(mesh_node)
+    
+    # Add wireframe overlay for edge definition (optional)
+    wireframe_material = pyrender.MetallicRoughnessMaterial(
+        baseColorFactor=[0.0, 0.0, 0.0, 1.0],  # Black wireframe
+        metallicFactor=0.0,
+        roughnessFactor=1.0
+    )
+    
+    # Create wireframe mesh
+    wireframe_mesh = mesh.copy()
+    wireframe_mesh.visual.face_colors = [0, 0, 0, 255]  # Black
+    wireframe_node = pyrender.Mesh.from_trimesh(
+        wireframe_mesh, 
+        material=wireframe_material,
+        wireframe=True
+    )
+    scene.add(wireframe_node)
     
     # Add perspective camera
     cam = pyrender.PerspectiveCamera(yfov=np.deg2rad(45), znear=0.05, zfar=50)
     scene.add(cam, pose=camera_pose)
     
-    # Add directional light co-located with camera
-    light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=light_intensity)
-    scene.add(light, pose=camera_pose)
+    # Add main directional light (key light)
+    main_light = pyrender.DirectionalLight(
+        color=[1.0, 1.0, 1.0], 
+        intensity=light_intensity
+    )
+    scene.add(main_light, pose=camera_pose)
+    
+    # Add fill light from opposite side for better contrast
+    fill_light_pose = camera_pose.copy()
+    fill_light_pose[0:3, 3] = -fill_light_pose[0:3, 3] * 0.5  # Opposite side, closer
+    fill_light = pyrender.DirectionalLight(
+        color=[1.0, 1.0, 1.0], 
+        intensity=light_intensity * 0.3  # Dimmer fill light
+    )
+    scene.add(fill_light, pose=fill_light_pose)
     
     return scene
 
