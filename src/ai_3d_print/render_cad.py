@@ -40,7 +40,7 @@ def generate_stl(model: cq.Workplane, output_path: Path) -> bool:
 
 def svg_to_png(svg_content: str, output_path: Path, width: int = 800, height: int = 600) -> bool:
     """
-    Convert SVG content to PNG file.
+    Convert SVG content to PNG file with white background.
     
     Args:
         svg_content: SVG content as string
@@ -52,18 +52,43 @@ def svg_to_png(svg_content: str, output_path: Path, width: int = 800, height: in
         bool: True if successful, False otherwise
     """
     try:
-        # Convert SVG to PNG using cairosvg
+        # Convert SVG to PNG using cairosvg with white background
         png_data = cairosvg.svg2png(
             bytestring=svg_content.encode('utf-8'),
             output_width=width,
-            output_height=height
+            output_height=height,
+            background_color='white'
         )
         
-        # Save PNG data to file
-        with open(output_path, 'wb') as f:
-            f.write(png_data)
+        # Save PNG data to file and ensure white background
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_png:
+            temp_png.write(png_data)
+            temp_png_path = temp_png.name
         
-        logger.info(f"Successfully converted SVG to PNG: {output_path}")
+        # Open with PIL to ensure white background and better formatting
+        with Image.open(temp_png_path) as img:
+            # Convert to RGB if needed (removes alpha channel)
+            if img.mode in ('RGBA', 'LA'):
+                # Create white background
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'RGBA':
+                    background.paste(img, mask=img.split()[-1])  # Use alpha channel as mask
+                else:
+                    background.paste(img)
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            # Save with white background
+            img.save(output_path, 'PNG', quality=95)
+        
+        # Clean up temp file
+        try:
+            Path(temp_png_path).unlink()
+        except:
+            pass
+        
+        logger.info(f"Successfully converted SVG to PNG with white background: {output_path}")
         return True
         
     except Exception as e:
@@ -107,7 +132,7 @@ def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) ->
             # Generate SVG using CadQuery's export functionality
             with tempfile.NamedTemporaryFile(mode='w', suffix='.svg', delete=False) as temp_svg:
                 try:
-                    # Export model to SVG
+                    # Export model to SVG with better styling
                     cq.exporters.export(
                         model,
                         temp_svg.name,
@@ -119,10 +144,12 @@ def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) ->
                             "marginTop": 50,
                             "showAxes": False,
                             "projectionDir": view_params["direction"],
-                            "strokeWidth": 0.25,
-                            "strokeColor": (0, 0, 0),
-                            "hiddenColor": (160, 160, 160),
-                            "showHidden": True
+                            "strokeWidth": 1.0,
+                            "strokeColor": (50, 50, 50),      # Dark gray outlines
+                            "hiddenColor": (180, 180, 180),   # Light gray for hidden lines
+                            "showHidden": True,
+                            "fillColor": (220, 230, 255),     # Light blue fill for faces
+                            "backgroundColor": (255, 255, 255) # White background
                         }
                     )
                     
