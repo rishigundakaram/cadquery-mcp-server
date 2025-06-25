@@ -46,7 +46,7 @@ show_object(result)
         test_file.write_text(test_content)
         print(f"✅ Created test file: {test_file}")
 
-        # Test verification
+        # Test verification with default output
         sys.path.append(str(Path(__file__).parent.parent))
         import server
         result = server.verify_cad_query(str(test_file), "simple 10x10x10 box")
@@ -61,6 +61,56 @@ show_object(result)
         print(f"❌ Real file test failed: {e}")
         if test_file.exists():
             test_file.unlink()
+        return False
+
+
+def test_with_custom_output_path():
+    """Test verification with custom output path"""
+    print("\n🧪 Testing with custom output path...")
+
+    # Create a simple test file
+    test_file = Path("test_cylinder.py")
+    test_content = '''import cadquery as cq
+result = cq.Workplane("XY").cylinder(5, 20)
+show_object(result)
+'''
+
+    try:
+        test_file.write_text(test_content)
+        print(f"✅ Created test file: {test_file}")
+
+        # Test verification with custom output path
+        custom_output = Path("custom_outputs")
+        sys.path.append(str(Path(__file__).parent.parent))
+        from src.ai_3d_print.verify_helper import verify_model
+        
+        result = verify_model(str(test_file), str(custom_output))
+        print(f"✅ Verification with custom output: {json.dumps(result, indent=2)}")
+
+        # Check if files were created in custom location
+        expected_dir = custom_output / "test_cylinder"
+        if expected_dir.exists():
+            print(f"✅ Custom output directory created: {expected_dir}")
+        else:
+            print(f"❌ Custom output directory not found: {expected_dir}")
+
+        # Cleanup
+        test_file.unlink()
+        if custom_output.exists():
+            import shutil
+            shutil.rmtree(custom_output)
+            print("✅ Cleaned up custom output directory")
+
+        return True
+    except Exception as e:
+        print(f"❌ Custom output test failed: {e}")
+        if test_file.exists():
+            test_file.unlink()
+        # Cleanup custom output if it exists
+        custom_output = Path("custom_outputs")
+        if custom_output.exists():
+            import shutil
+            shutil.rmtree(custom_output)
         return False
 
 
@@ -164,6 +214,7 @@ def main():
         tests = [
             test_server_basic,
             test_with_real_file,
+            test_with_custom_output_path,
             test_generate_cad_query,
             test_mcp_inspector,
             test_claude_desktop_config
