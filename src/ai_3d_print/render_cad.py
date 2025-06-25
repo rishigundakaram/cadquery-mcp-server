@@ -3,9 +3,12 @@
 import logging
 from pathlib import Path
 from typing import Any, Dict
+import tempfile
+import math
 
 import cadquery as cq
-from cadquery.vis import show
+import cairosvg
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +38,42 @@ def generate_stl(model: cq.Workplane, output_path: Path) -> bool:
         return False
 
 
+def svg_to_png(svg_content: str, output_path: Path, width: int = 800, height: int = 600) -> bool:
+    """
+    Convert SVG content to PNG file.
+    
+    Args:
+        svg_content: SVG content as string
+        output_path: Path where PNG file should be saved
+        width: Output image width
+        height: Output image height
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Convert SVG to PNG using cairosvg
+        png_data = cairosvg.svg2png(
+            bytestring=svg_content.encode('utf-8'),
+            output_width=width,
+            output_height=height
+        )
+        
+        # Save PNG data to file
+        with open(output_path, 'wb') as f:
+            f.write(png_data)
+        
+        logger.info(f"Successfully converted SVG to PNG: {output_path}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to convert SVG to PNG: {e}")
+        return False
+
+
 def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) -> Dict[str, Any]:
     """
-    Generate PNG views of the CAD model from different angles using CadQuery's native visualization.
+    Generate PNG views of the CAD model from different angles using SVG export and conversion.
     
     Args:
         model: CAD-Query Workplane object
@@ -55,37 +91,64 @@ def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) ->
         "errors": []
     }
     
-    # Define the views to generate with their camera parameters
+    # Define the views to generate with their projection parameters
     views = {
-        "right": {"elevation": 0, "roll": 90, "zoom": 1.5},     # Looking from +X axis
-        "top": {"elevation": 90, "roll": 0, "zoom": 1.5},       # Looking from +Z axis (top down)
-        "down": {"elevation": -90, "roll": 0, "zoom": 1.5},     # Looking from -Z axis (bottom up)
-        "iso": {"elevation": 30, "roll": 45, "zoom": 1.2}       # Isometric view
+        "front": {"direction": (0, -1, 0), "up": (0, 0, 1)},    # Front view (XZ plane)
+        "right": {"direction": (1, 0, 0), "up": (0, 0, 1)},     # Right view (YZ plane)
+        "top": {"direction": (0, 0, -1), "up": (0, 1, 0)},      # Top view (XY plane)
+        "iso": {"direction": (1, -1, 1), "up": (0, 0, 1)}       # Isometric view
     }
     
-    # Generate each view using CadQuery's native show() function
+    # Generate each view using SVG export and conversion
     for view_name, view_params in views.items():
         try:
             output_file = output_dir / f"{base_name}_{view_name}.png"
             
-            # Use CadQuery's native show() function with screenshot capability
-            show(
-                model,
-                width=800,
-                height=600,
-                screenshot=str(output_file),
-                zoom=view_params["zoom"],
-                roll=view_params["roll"],
-                elevation=view_params["elevation"],
-                interact=False  # Don't open interactive window
-            )
-            
-            results["files"][view_name] = str(output_file)
-            logger.info(f"Generated {view_name} view: {output_file}")
+            # Generate SVG using CadQuery's export functionality
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.svg', delete=False) as temp_svg:
+                try:
+                    # Export model to SVG
+                    cq.exporters.export(
+                        model,
+                        temp_svg.name,
+                        exportType=cq.exporters.ExportTypes.SVG,
+                        opt={
+                            "width": 800,
+                            "height": 600,
+                            "marginLeft": 50,
+                            "marginTop": 50,
+                            "showAxes": False,
+                            "projectionDir": view_params["direction"],
+                            "strokeWidth": 0.25,
+                            "strokeColor": (0, 0, 0),
+                            "hiddenColor": (160, 160, 160),
+                            "showHidden": True
+                        }
+                    )
+                    
+                    # Read the generated SVG content
+                    svg_content = Path(temp_svg.name).read_text()
+                    
+                    # Convert SVG to PNG
+                    if svg_to_png(svg_content, output_file):
+                        results["files"][view_name] = str(output_file)
+                        logger.info(f"Generated {view_name} view: {output_file}")
+                    else:
+                        results["errors"].append(f"Failed to convert {view_name} view SVG to PNG")
+                        
+                except Exception as e:
+                    results["errors"].append(f"Failed to generate {view_name} view: {e}")
+                    logger.error(f"Error generating {view_name} view: {e}")
+                finally:
+                    # Clean up temporary SVG file
+                    try:
+                        Path(temp_svg.name).unlink()
+                    except:
+                        pass
             
         except Exception as e:
-            results["errors"].append(f"Failed to generate {view_name} view: {e}")
-            logger.error(f"Error generating {view_name} view: {e}")
+            results["errors"].append(f"Failed to create temporary file for {view_name} view: {e}")
+            logger.error(f"Error creating temporary file for {view_name} view: {e}")
     
     # Update status based on results
     if results["errors"] and not results["files"]:
