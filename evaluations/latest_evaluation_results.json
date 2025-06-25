@@ -1,0 +1,440 @@
+{
+  "timestamp": "20250624_220631",
+  "output_directory": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631",
+  "total_tests": 23,
+  "correct": 19,
+  "accuracy": 82.6086956521739,
+  "precision": 1.0,
+  "recall": 0.8260869565217391,
+  "f1_score": 0.9047619047619047,
+  "confusion_matrix": {
+    "true_positives": 19,
+    "true_negatives": 0,
+    "false_positives": 0,
+    "false_negatives": 4
+  },
+  "results": [
+    {
+      "test_name": "rounded_cube",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/rounded_cube/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "rounded cube with filleted edges - 5cm cubic base with 0.5cm radius fillets applied to all edges for smooth, rounded appearance while maintaining cubic proportions"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/rounded_cube"
+    },
+    {
+      "test_name": "functional_gear",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/functional_gear/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "functional 12-tooth gear with involute tooth profile - 4cm outer diameter, 2cm inner diameter, 0.5cm thickness, 20-degree pressure angle, center hole with keyway for shaft attachment, proper tooth geometry for mechanical applications"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/functional_gear"
+    },
+    {
+      "test_name": "decorative_bowl",
+      "expected": "PASS",
+      "actual": "FAIL",
+      "correct": false,
+      "result": {
+        "status": "FAIL",
+        "message": "Verification failed: More than one wire or face is required",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/decorative_bowl/model.py",
+        "details": [],
+        "errors": [
+          "More than one wire or face is required"
+        ],
+        "criteria": "decorative bowl with organic wave-pattern rim - 8cm base diameter expanding to 12cm top diameter, 4cm height, 0.4cm wall thickness, wave rim with 8 frequency waves and 0.5cm amplitude, includes 3 decorative ridges on exterior surface"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/decorative_bowl"
+    },
+    {
+      "test_name": "phone_stand",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/phone_stand/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "angled phone stand with cable management - 8cm x 6cm base with 1cm thickness, 60-degree viewing angle back support, 1cm wide phone slot, 1.2cm diameter cable hole positioned on base for cord management"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/phone_stand"
+    },
+    {
+      "test_name": "box",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/box/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "simple box with hole"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/box"
+    },
+    {
+      "test_name": "triangular_gear",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/triangular_gear/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "triangular-toothed gear with 32 teeth - 1 unit diameter (0.5 unit radius), 0.05 unit tooth depth, 0.1 unit thickness, triangular teeth with precise angular spacing, center hole with 0.05 unit radius"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/triangular_gear"
+    },
+    {
+      "test_name": "spiral_staircase",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/spiral_staircase/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "helical spiral staircase with handrail - 8 steps total, 6 units total height, 4 unit radius, center post with 0.5 unit radius, individual steps with 1 unit width and 0.3 unit thickness, helical handrail with 0.1 unit diameter swept along helical path"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/spiral_staircase"
+    },
+    {
+      "test_name": "simple_ring",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/simple_ring/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "simple torus ring created by revolve operation - 3 unit major radius with 0.8 unit minor radius, circular cross-section revolved 360 degrees around Y-axis in XZ plane"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/simple_ring"
+    },
+    {
+      "test_name": "snowman",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/snowman/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "snowman shape"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/snowman"
+    },
+    {
+      "test_name": "donut",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/donut/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "torus shape"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/donut"
+    },
+    {
+      "test_name": "coffee_mug",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/coffee_mug/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "coffee mug with handle"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/coffee_mug"
+    },
+    {
+      "test_name": "threaded_bottle",
+      "expected": "PASS",
+      "actual": "FAIL",
+      "correct": false,
+      "result": {
+        "status": "FAIL",
+        "message": "Verification failed: More than one wire or face is required",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/threaded_bottle/model.py",
+        "details": [],
+        "errors": [
+          "More than one wire or face is required"
+        ],
+        "criteria": "threaded bottle with neck threading for cap attachment - 15cm height, 6cm base diameter tapering to 3cm neck diameter, 0.3cm wall thickness, hollow interior, external threading on neck with 0.5cm pitch and 0.2cm depth for proper cap attachment"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/threaded_bottle"
+    },
+    {
+      "test_name": "pyramid",
+      "expected": "PASS",
+      "actual": "FAIL",
+      "correct": false,
+      "result": {
+        "status": "FAIL",
+        "message": "Verification failed: More than one wire or face is required",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/pyramid/model.py",
+        "details": [],
+        "errors": [
+          "More than one wire or face is required"
+        ],
+        "criteria": "square pyramid using loft operation - 6cm x 6cm square base lofted to apex point 8 units above base, created using faces and loft between base square and tiny circle at top"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/pyramid"
+    },
+    {
+      "test_name": "simple_cylinder",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/simple_cylinder/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "simple cylinder"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/simple_cylinder"
+    },
+    {
+      "test_name": "organizer",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/organizer/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "multi-compartment organizer with circular compartments - 12cm x 8cm x 2cm rectangular base with 3 circular compartments of different sizes: 3cm diameter (left), 2.5cm diameter (top right), 2cm diameter (bottom right), all with 1.5cm depth"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/organizer"
+    },
+    {
+      "test_name": "decorative_sphere",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/decorative_sphere/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "decorative sphere with dimpled texture - 4cm radius main sphere with 12 dimples of 0.5cm radius spheres subtracted from surface, dimples distributed across top hemisphere, equatorial band, and bottom hemisphere for textural decoration"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/decorative_sphere"
+    },
+    {
+      "test_name": "chair",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/chair/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "functional chair with seat, backrest, and 4 cylindrical legs - seat dimensions 40x40x3 units, leg height 45 units with 4 unit diameter, backrest height 35 units with 2 unit thickness positioned at rear of seat"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/chair"
+    },
+    {
+      "test_name": "pen_holder",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/pen_holder/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "cylindrical pen holder with thick base - 8 units height, 4 units outer diameter, 3.5 units inner diameter, 0.25 units base thickness to prevent pen tips from touching bottom surface"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/pen_holder"
+    },
+    {
+      "test_name": "keychain_tag",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/keychain_tag/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "flat keychain name tag with extruded text - 4cm length, 2cm width, 0.3cm thickness, 0.4cm diameter keyring hole, raised \"TAG\" text formed from geometric shapes with 0.1cm extrusion depth"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/keychain_tag"
+    },
+    {
+      "test_name": "flower_vase",
+      "expected": "PASS",
+      "actual": "FAIL",
+      "correct": false,
+      "result": {
+        "status": "FAIL",
+        "message": "Verification failed: More than one wire or face is required",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/flower_vase/model.py",
+        "details": [],
+        "errors": [
+          "More than one wire or face is required"
+        ],
+        "criteria": "tapered flower vase with decorative ridges - 6cm base diameter tapering to 4cm top diameter, 12cm height, 0.4cm wall thickness, hollow interior with 8 decorative ridges positioned at regular intervals along exterior surface"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/flower_vase"
+    },
+    {
+      "test_name": "mushroom_lamp",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/mushroom_lamp/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "mushroom-shaped lamp with hollow interior - 6cm diameter cap with dome profile, 8cm hollow stem with 1.5cm outer diameter and 1cm inner diameter, cord management hole at base, hollow construction for LED lighting"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/mushroom_lamp"
+    },
+    {
+      "test_name": "puzzle_piece",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/puzzle_piece/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "interlocking jigsaw puzzle piece with knobs and blanks - 3cm square base with 0.5cm thickness, 4 sides with alternating knobs (protrusions) and blanks (indentations), 0.4cm radius knobs with proper tolerances for interlocking fit, rounded corners and identification number \"1\""
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/puzzle_piece"
+    },
+    {
+      "test_name": "coffee_mug_v2",
+      "expected": "PASS",
+      "actual": "PASS",
+      "correct": true,
+      "result": {
+        "status": "PASS",
+        "message": "CAD model verification completed successfully",
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/coffee_mug_v2/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "coffee mug with curved handle - 9cm height, 7cm diameter, 0.5cm wall thickness, handle created using spline sweep from 6 control points positioned around mug exterior"
+      },
+      "visual_outputs": {
+        "generation_status": "render script not found"
+      },
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/20250624_220631/coffee_mug_v2"
+    }
+  ]
+}

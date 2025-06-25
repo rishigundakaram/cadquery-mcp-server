@@ -7,8 +7,10 @@ with known expected results to measure verification accuracy.
 """
 
 import json
+import shutil
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -92,16 +94,34 @@ def generate_visual_outputs(model_file: Path, output_dir: Path) -> dict[str, str
     return outputs
 
 
-def run_single_test(test_name: str, test_data: dict[str, str]) -> dict[str, Any]:
+def run_single_test(test_name: str, test_data: dict[str, str], base_output_dir: Path) -> dict[str, Any]:
     """Run verification on a single test model."""
     model_file = Path(test_data["model_path"])
     print(f"📝 Testing: {test_name}")
 
-    # Create output directory for this model
-    model_output_dir = Path(__file__).parent / "test_outputs" / test_name
+    # Create output directory for this specific test within the timestamped directory
+    model_output_dir = base_output_dir / test_name
 
-    # Run the verification
+    # Run the verification using the server function
     result = server.verify_cad_query(test_data["model_path"], test_data["criteria"])
+    
+    # Move generated outputs to the timestamped directory
+    model_name = model_file.stem
+    # Files are generated in evaluations/test_cases/outputs/model/ (always named "model")
+    default_outputs_dir = Path(__file__).parent / "test_cases" / "outputs" / "model"
+    
+    if default_outputs_dir.exists():
+        # Create the model-specific directory in our timestamped output
+        model_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Move all files from default output to our timestamped directory
+        for output_file in default_outputs_dir.iterdir():
+            if output_file.is_file():
+                dest_file = model_output_dir / output_file.name
+                shutil.move(str(output_file), str(dest_file))
+        
+        # Remove the empty default directory
+        default_outputs_dir.rmdir()
 
     # Generate visual outputs
     print(f"   Generating visual outputs...")
@@ -132,10 +152,16 @@ def run_single_test(test_name: str, test_data: dict[str, str]) -> dict[str, Any]
     }
 
 
-def run_evaluation() -> dict[str, Any]:
+def run_evaluation() -> tuple[dict[str, Any], Path]:
     """Run evaluation on all test models."""
     print("🚀 CAD Verification Evaluation Harness")
     print("=" * 50)
+    
+    # Create timestamped output directory
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    base_output_dir = Path(__file__).parent / "test_outputs" / timestamp
+    base_output_dir.mkdir(parents=True, exist_ok=True)
+    print(f"📁 Output directory: {base_output_dir}")
 
     # Load test cases
     try:
@@ -158,7 +184,7 @@ def run_evaluation() -> dict[str, Any]:
     print("-" * 30)
 
     for test_name, test_data in test_cases.items():
-        test_result = run_single_test(test_name, test_data)
+        test_result = run_single_test(test_name, test_data, base_output_dir)
         results.append(test_result)
 
         if test_result["correct"]:
@@ -198,7 +224,7 @@ def run_evaluation() -> dict[str, Any]:
     print(f"Precision:      {precision:.3f}")
     print(f"Recall:         {recall:.3f}")
     print(f"F1 Score:       {f1_score:.3f}")
-    print(f"Visual Outputs: test_outputs/ directory")
+    print(f"Output Directory: {base_output_dir}")
     
     # Print confusion matrix
     print("\n📋 Confusion Matrix:")
@@ -215,7 +241,9 @@ def run_evaluation() -> dict[str, Any]:
     else:
         print("⚠️  Significant issues detected, verification logic needs improvement.")
 
-    return {
+    evaluation_summary = {
+        "timestamp": timestamp,
+        "output_directory": str(base_output_dir),
         "total_tests": total_count,
         "correct": correct_count,
         "accuracy": accuracy,
@@ -230,19 +258,27 @@ def run_evaluation() -> dict[str, Any]:
         },
         "results": results,
     }
+    
+    return evaluation_summary, base_output_dir
 
 
 def main():
     """Main function."""
     try:
-        evaluation_results = run_evaluation()
+        evaluation_results, output_dir = run_evaluation()
 
-        # Save detailed results
-        results_file = Path(__file__).parent / "evaluation_results.json"
+        # Save detailed results in the timestamped directory
+        results_file = output_dir / "evaluation_results.json"
         with open(results_file, "w") as f:
             json.dump(evaluation_results, f, indent=2)
 
+        # Also save a copy in the main evaluations directory for easy access
+        latest_results_file = Path(__file__).parent / "latest_evaluation_results.json"
+        with open(latest_results_file, "w") as f:
+            json.dump(evaluation_results, f, indent=2)
+
         print(f"\n📄 Detailed results saved to: {results_file}")
+        print(f"📄 Latest results also saved to: {latest_results_file}")
 
         # Exit with appropriate code
         if evaluation_results.get("accuracy", 0) == 100:
