@@ -77,7 +77,7 @@ def verify_cad_with_openai(png_files: Dict[str, str], criteria: str) -> Dict[str
     
     # Call OpenAI API with structured output
     response = client.beta.chat.completions.parse(
-        model="o3-mini",
+        model="o4-mini",
         messages=messages,
         response_format=VerificationResult
     )
