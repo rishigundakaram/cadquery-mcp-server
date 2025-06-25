@@ -3,11 +3,11 @@
 import logging
 from pathlib import Path
 from typing import Any, Dict
-import tempfile
-import math
+import numpy as np
 
 import cadquery as cq
-import cairosvg
+import trimesh
+import pyrender
 from PIL import Image
 
 logger = logging.getLogger(__name__)
@@ -38,67 +38,98 @@ def generate_stl(model: cq.Workplane, output_path: Path) -> bool:
         return False
 
 
-def svg_to_png(svg_content: str, output_path: Path, width: int = 800, height: int = 600) -> bool:
+def look_at(eye: np.ndarray, target: np.ndarray, up: np.ndarray) -> np.ndarray:
     """
-    Convert SVG content to PNG file with white background.
+    Generate a 4x4 look-at transformation matrix.
     
     Args:
-        svg_content: SVG content as string
-        output_path: Path where PNG file should be saved
-        width: Output image width
-        height: Output image height
+        eye: Camera position
+        target: Point to look at
+        up: Up vector
+        
+    Returns:
+        4x4 transformation matrix
+    """
+    # Calculate camera coordinate system
+    forward = target - eye
+    forward = forward / np.linalg.norm(forward)
+    
+    right = np.cross(forward, up)
+    right = right / np.linalg.norm(right)
+    
+    up_corrected = np.cross(right, forward)
+    up_corrected = up_corrected / np.linalg.norm(up_corrected)
+    
+    # Create transformation matrix
+    transform = np.eye(4)
+    transform[0:3, 0] = right
+    transform[0:3, 1] = up_corrected  
+    transform[0:3, 2] = -forward
+    transform[0:3, 3] = eye
+    
+    return transform
+
+
+def spherical_pose(theta_deg: float, phi_deg: float, radius: float) -> np.ndarray:
+    """
+    Generate a 4x4 camera-to-world transform matrix for spherical coordinates.
+    
+    Args:
+        theta_deg: Azimuth angle in degrees
+        phi_deg: Elevation angle in degrees  
+        radius: Distance from origin
     
     Returns:
-        bool: True if successful, False otherwise
+        4x4 transformation matrix
     """
-    try:
-        # Convert SVG to PNG using cairosvg with white background
-        png_data = cairosvg.svg2png(
-            bytestring=svg_content.encode('utf-8'),
-            output_width=width,
-            output_height=height,
-            background_color='white'
-        )
-        
-        # Save PNG data to file and ensure white background
-        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_png:
-            temp_png.write(png_data)
-            temp_png_path = temp_png.name
-        
-        # Open with PIL to ensure white background and better formatting
-        with Image.open(temp_png_path) as img:
-            # Convert to RGB if needed (removes alpha channel)
-            if img.mode in ('RGBA', 'LA'):
-                # Create white background
-                background = Image.new('RGB', img.size, (255, 255, 255))
-                if img.mode == 'RGBA':
-                    background.paste(img, mask=img.split()[-1])  # Use alpha channel as mask
-                else:
-                    background.paste(img)
-                img = background
-            elif img.mode != 'RGB':
-                img = img.convert('RGB')
-            
-            # Save with white background
-            img.save(output_path, 'PNG', quality=95)
-        
-        # Clean up temp file
-        try:
-            Path(temp_png_path).unlink()
-        except:
-            pass
-        
-        logger.info(f"Successfully converted SVG to PNG with white background: {output_path}")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Failed to convert SVG to PNG: {e}")
-        return False
+    theta, phi = np.deg2rad(theta_deg), np.deg2rad(phi_deg)
+    
+    # Cartesian coordinates on a sphere
+    x = radius * np.cos(phi) * np.sin(theta)
+    y = radius * np.sin(phi)
+    z = radius * np.cos(phi) * np.cos(theta)
+    
+    # Look-at origin
+    eye = np.array([x, y, z])
+    target = np.zeros(3)
+    up = np.array([0, 1, 0])
+    
+    return look_at(eye, target, up)
+
+
+def make_scene(mesh: trimesh.Trimesh, camera_pose: np.ndarray, 
+               light_intensity: float = 3.0) -> pyrender.Scene:
+    """
+    Create a pyrender scene with mesh, camera, and lighting.
+    
+    Args:
+        mesh: Trimesh object to render
+        camera_pose: 4x4 camera transformation matrix
+        light_intensity: Brightness of the directional light
+    
+    Returns:
+        Configured pyrender scene
+    """
+    scene = pyrender.Scene(bg_color=[1.0, 1.0, 1.0, 1.0], ambient_light=[0.1, 0.1, 0.1])
+    
+    # Add mesh with smooth shading
+    mesh_node = pyrender.Mesh.from_trimesh(mesh, smooth=True)
+    scene.add(mesh_node)
+    
+    # Add perspective camera
+    cam = pyrender.PerspectiveCamera(yfov=np.deg2rad(45), znear=0.05, zfar=50)
+    scene.add(cam, pose=camera_pose)
+    
+    # Add directional light co-located with camera
+    light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=light_intensity)
+    scene.add(light, pose=camera_pose)
+    
+    return scene
 
 
 def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) -> Dict[str, Any]:
     """
-    Generate PNG views of the CAD model from different angles using SVG export and conversion.
+    Generate high-quality 3D rendered PNG views using trimesh + pyrender.
     
     Args:
         model: CAD-Query Workplane object
@@ -116,66 +147,66 @@ def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) ->
         "errors": []
     }
     
-    # Define the views to generate with their projection parameters
-    views = {
-        "front": {"direction": (0, -1, 0), "up": (0, 0, 1)},    # Front view (XZ plane)
-        "right": {"direction": (1, 0, 0), "up": (0, 0, 1)},     # Right view (YZ plane)
-        "top": {"direction": (0, 0, -1), "up": (0, 1, 0)},      # Top view (XY plane)
-        "iso": {"direction": (1, -1, 1), "up": (0, 0, 1)}       # Isometric view
-    }
-    
-    # Generate each view using SVG export and conversion
-    for view_name, view_params in views.items():
+    try:
+        # First generate STL file to load with trimesh
+        temp_stl = output_dir / f"{base_name}_temp.stl"
+        cq.exporters.export(model, str(temp_stl))
+        
+        # Load mesh with trimesh
+        mesh = trimesh.load(str(temp_stl))
+        
+        # Normalize mesh - fit to unit cube and center
+        mesh.apply_scale(1.0 / mesh.scale)
+        mesh.apply_translation(-mesh.center_mass)
+        
+        # Clean up temp STL
         try:
-            output_file = output_dir / f"{base_name}_{view_name}.png"
-            
-            # Generate SVG using CadQuery's export functionality
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.svg', delete=False) as temp_svg:
+            temp_stl.unlink()
+        except:
+            pass
+        
+        # Define camera positions for different views
+        views = {
+            "front": (0, 20, 3.0),      # Front view
+            "right": (90, 20, 3.0),     # Right side view  
+            "top": (0, 85, 3.0),        # Top down view
+            "iso": (45, 35, 3.5),       # Isometric view
+        }
+        
+        # Set up off-screen renderer
+        renderer = pyrender.OffscreenRenderer(1024, 1024)
+        
+        try:
+            for view_name, (theta, phi, radius) in views.items():
                 try:
-                    # Export model to SVG with better styling
-                    cq.exporters.export(
-                        model,
-                        temp_svg.name,
-                        exportType=cq.exporters.ExportTypes.SVG,
-                        opt={
-                            "width": 800,
-                            "height": 600,
-                            "marginLeft": 50,
-                            "marginTop": 50,
-                            "showAxes": False,
-                            "projectionDir": view_params["direction"],
-                            "strokeWidth": 1.0,
-                            "strokeColor": (50, 50, 50),      # Dark gray outlines
-                            "hiddenColor": (180, 180, 180),   # Light gray for hidden lines
-                            "showHidden": True,
-                            "fillColor": (220, 230, 255),     # Light blue fill for faces
-                            "backgroundColor": (255, 255, 255) # White background
-                        }
-                    )
+                    output_file = output_dir / f"{base_name}_{view_name}.png"
                     
-                    # Read the generated SVG content
-                    svg_content = Path(temp_svg.name).read_text()
+                    # Generate camera pose
+                    camera_pose = spherical_pose(theta, phi, radius)
                     
-                    # Convert SVG to PNG
-                    if svg_to_png(svg_content, output_file):
-                        results["files"][view_name] = str(output_file)
-                        logger.info(f"Generated {view_name} view: {output_file}")
-                    else:
-                        results["errors"].append(f"Failed to convert {view_name} view SVG to PNG")
-                        
+                    # Create scene
+                    scene = make_scene(mesh, camera_pose)
+                    
+                    # Render with shadows
+                    color, depth = renderer.render(scene, flags=pyrender.RenderFlags.SHADOWS_DIRECTIONAL)
+                    
+                    # Convert to PIL Image and save
+                    img = Image.fromarray(color)
+                    img.save(output_file, 'PNG')
+                    
+                    results["files"][view_name] = str(output_file)
+                    logger.info(f"Generated {view_name} view: {output_file}")
+                    
                 except Exception as e:
                     results["errors"].append(f"Failed to generate {view_name} view: {e}")
                     logger.error(f"Error generating {view_name} view: {e}")
-                finally:
-                    # Clean up temporary SVG file
-                    try:
-                        Path(temp_svg.name).unlink()
-                    except:
-                        pass
+        
+        finally:
+            renderer.delete()
             
-        except Exception as e:
-            results["errors"].append(f"Failed to create temporary file for {view_name} view: {e}")
-            logger.error(f"Error creating temporary file for {view_name} view: {e}")
+    except Exception as e:
+        results["errors"].append(f"Failed to load mesh for 3D rendering: {e}")
+        logger.error(f"Error in 3D rendering pipeline: {e}")
     
     # Update status based on results
     if results["errors"] and not results["files"]:
