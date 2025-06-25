@@ -1,0 +1,1 @@
+helical spiral staircase with handrail - 8 steps total, 6 units total height, 4 unit radius, center post with 0.5 unit radius, individual steps with 1 unit width and 0.3 unit thickness, helical handrail with 0.1 unit diameter swept along helical path

@@ -1,0 +1,1 @@
+simple torus ring created by revolve operation - 3 unit major radius with 0.8 unit minor radius, circular cross-section revolved 360 degrees around Y-axis in XZ plane
