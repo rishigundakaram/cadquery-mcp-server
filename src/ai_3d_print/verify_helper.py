@@ -9,12 +9,13 @@ from .render_cad import load_cadquery_model, generate_stl, generate_png_views
 logger = logging.getLogger(__name__)
 
 
-def verify_model(file_path: str) -> Dict[str, Any]:
+def verify_model(file_path: str, output_path: str = None) -> Dict[str, Any]:
     """
     Verify a CAD-Query model by generating STL and PNG outputs.
     
     Args:
         file_path: Path to the CAD-Query Python file
+        output_path: Optional custom output directory. If not provided, uses default location.
     
     Returns:
         Dictionary containing verification results and output file paths
@@ -38,7 +39,10 @@ def verify_model(file_path: str) -> Dict[str, Any]:
         
         # Create output directory
         file_name = script_path.stem
-        outputs_dir = script_path.parent.parent / "outputs" / file_name
+        if output_path:
+            outputs_dir = Path(output_path) / file_name
+        else:
+            outputs_dir = script_path.parent.parent / "outputs" / file_name
         outputs_dir.mkdir(parents=True, exist_ok=True)
         
         # Load the CAD-Query model (this will fail if code doesn't compile)
