@@ -20,14 +20,15 @@
       "result": {
         "status": "PASS",
         "message": "CAD model verification completed successfully",
-        "file_path": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_cases/box/model.py",
-        "criteria": "simple box with hole",
-        "details": "Dummy verification - always passes"
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/box/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "simple box with hole"
       },
       "visual_outputs": {
         "generation_status": "render script not found"
       },
-      "output_dir": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_outputs/box"
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/box"
     },
     {
       "test_name": "snowman",
@@ -37,14 +38,15 @@
       "result": {
         "status": "PASS",
         "message": "CAD model verification completed successfully",
-        "file_path": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_cases/snowman/model.py",
-        "criteria": "snowman shape",
-        "details": "Dummy verification - always passes"
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/snowman/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "snowman shape"
       },
       "visual_outputs": {
         "generation_status": "render script not found"
       },
-      "output_dir": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_outputs/snowman"
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/snowman"
     },
     {
       "test_name": "donut",
@@ -54,14 +56,15 @@
       "result": {
         "status": "PASS",
         "message": "CAD model verification completed successfully",
-        "file_path": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_cases/donut/model.py",
-        "criteria": "torus shape",
-        "details": "Dummy verification - always passes"
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/donut/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "torus shape"
       },
       "visual_outputs": {
         "generation_status": "render script not found"
       },
-      "output_dir": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_outputs/donut"
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/donut"
     },
     {
       "test_name": "coffee_mug",
@@ -71,14 +74,15 @@
       "result": {
         "status": "PASS",
         "message": "CAD model verification completed successfully",
-        "file_path": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_cases/coffee_mug/model.py",
-        "criteria": "coffee mug with handle",
-        "details": "Dummy verification - always passes"
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/coffee_mug/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "coffee mug with handle"
       },
       "visual_outputs": {
         "generation_status": "render script not found"
       },
-      "output_dir": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_outputs/coffee_mug"
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/coffee_mug"
     },
     {
       "test_name": "simple_cylinder",
@@ -88,14 +92,15 @@
       "result": {
         "status": "PASS",
         "message": "CAD model verification completed successfully",
-        "file_path": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_cases/simple_cylinder/model.py",
-        "criteria": "simple cylinder",
-        "details": "Dummy verification - always passes"
+        "file_path": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_cases/simple_cylinder/model.py",
+        "details": [],
+        "errors": [],
+        "criteria": "simple cylinder"
       },
       "visual_outputs": {
         "generation_status": "render script not found"
       },
-      "output_dir": "/Users/rishigundakaram/Desktop/doodles/cadquery-mcp-server/evaluations/test_outputs/simple_cylinder"
+      "output_dir": "/Users/rishigundakaram/Desktop/doodles/3d-print-2/cadquery-mcp-server/evaluations/test_outputs/simple_cylinder"
     }
   ]
 }
