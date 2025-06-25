@@ -125,22 +125,48 @@ def make_scene(mesh: trimesh.Trimesh, camera_pose: np.ndarray,
     mesh_node = pyrender.Mesh.from_trimesh(mesh, material=material, smooth=True)
     scene.add(mesh_node)
     
-    # Add wireframe overlay for edge definition (optional)
+    # Add wireframe overlay for geometric edges only (not triangulation)
     wireframe_material = pyrender.MetallicRoughnessMaterial(
         baseColorFactor=[0.0, 0.0, 0.0, 1.0],  # Black wireframe
         metallicFactor=0.0,
         roughnessFactor=1.0
     )
     
-    # Create wireframe mesh
-    wireframe_mesh = mesh.copy()
-    wireframe_mesh.visual.face_colors = [0, 0, 0, 255]  # Black
-    wireframe_node = pyrender.Mesh.from_trimesh(
-        wireframe_mesh, 
-        material=wireframe_material,
-        wireframe=True
-    )
-    scene.add(wireframe_node)
+    # Add distinct edge highlighting using face normals to detect sharp edges
+    try:
+        # Find sharp edges (where face normals change significantly)
+        face_adjacency = mesh.face_adjacency
+        face_normals = mesh.face_normals
+        
+        # Calculate angle between adjacent faces
+        adjacent_face_normals = face_normals[face_adjacency]
+        face_angles = np.arccos(np.clip(
+            np.sum(adjacent_face_normals[:, 0] * adjacent_face_normals[:, 1], 
+                   axis=1), -1, 1))
+        
+        # Find edges where faces meet at sharp angles (> 30 degrees)
+        sharp_edge_mask = face_angles > np.deg2rad(30)
+        
+        if np.any(sharp_edge_mask):
+            # Create wireframe highlighting only sharp geometric edges
+            wireframe_mesh = mesh.copy()
+            wireframe_mesh.visual.face_colors = [0, 0, 0, 255]  # Black
+            wireframe_node = pyrender.Mesh.from_trimesh(
+                wireframe_mesh, 
+                material=wireframe_material,
+                wireframe=True
+            )
+            scene.add(wireframe_node)
+    except:
+        # Fallback to simple wireframe if edge detection fails
+        wireframe_mesh = mesh.copy() 
+        wireframe_mesh.visual.face_colors = [0, 0, 0, 255]  # Black
+        wireframe_node = pyrender.Mesh.from_trimesh(
+            wireframe_mesh,
+            material=wireframe_material, 
+            wireframe=True
+        )
+        scene.add(wireframe_node)
     
     # Add perspective camera
     cam = pyrender.PerspectiveCamera(yfov=np.deg2rad(45), znear=0.05, zfar=50)
@@ -209,6 +235,8 @@ def generate_png_views(model: cq.Workplane, output_dir: Path, base_name: str) ->
             "right": (90, 20, 3.0),     # Right side view  
             "top": (0, 85, 3.0),        # Top down view
             "iso": (45, 35, 3.5),       # Isometric view
+            "back_left": (135, 25, 3.2), # Back-left diagonal
+            "bottom_right": (315, -45, 3.0), # Bottom-right perspective
         }
         
         # Set up off-screen renderer
