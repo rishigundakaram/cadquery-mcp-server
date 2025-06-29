@@ -111,7 +111,7 @@ def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, An
 
 
 @mcp.tool()
-def generate_cad_query(description: str) -> dict[str, Any]:
+def generate_cad_query(description: str, parameters: str = "") -> dict[str, Any]:
     """
     Generate CAD-Query Python script from natural language description.
 
@@ -143,12 +143,16 @@ def generate_cad_query(description: str) -> dict[str, Any]:
                 "status": "ERROR",
                 "message": "Failed to load model. Please check server logs.",
                 "description": description,
+                "parameters": parameters,
                 "generated_code": None
             }
 
     try:
+        # Combine description and parameters for input
+        full_prompt = f"{description} {parameters}".strip()
+        
         # Tokenize input directly from description
-        inputs = tokenizer(description, return_tensors="pt", padding=True, truncation=True)
+        inputs = tokenizer(full_prompt, return_tensors="pt", padding=True, truncation=True)
         
         # Calculate max_new_tokens dynamically like original inference
         input_lengths = inputs["input_ids"].shape[1]
@@ -171,6 +175,7 @@ def generate_cad_query(description: str) -> dict[str, Any]:
             "status": "SUCCESS",
             "message": "CAD code generated successfully",
             "description": description,
+            "parameters": parameters,
             "generated_code": generated_code
         }
 
@@ -183,6 +188,7 @@ def generate_cad_query(description: str) -> dict[str, Any]:
             "status": "ERROR",
             "message": f"Error generating CAD code: {str(e)}",
             "description": description,
+            "parameters": parameters,
             "generated_code": None
         }
 

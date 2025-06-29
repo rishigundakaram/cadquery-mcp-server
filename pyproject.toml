@@ -7,7 +7,7 @@ name = "cadquery-mcp-server"
 version = "0.1.0"
 description = "MCP Server for CAD Verification with CadQuery"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 authors = [
     {name = "CadQuery MCP Server"}
 ]
@@ -28,32 +28,12 @@ dependencies = [
     "transformers>=4.30.0",
     "openai>=1.0.0",
     "pydantic>=2.0.0",
-]
-
-[project.optional-dependencies]
-cad = [
-    "cadquery>=2.4.0",
-    "trimesh>=4.0.0",
+    "numpy==1.26",
+    "pillow>=11.2.1",
+    "nptyping==1.4.4",
+    "trimesh>=4.6.12",
     "pyrender>=0.1.45",
-    "pillow>=10.0.0",
-    "numpy>=1.20.0",
-]
-dev = [
-    "pytest>=7.0.0",
-    "black>=22.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0.0",
-]
-all = [
-    "cadquery>=2.4.0",
-    "trimesh>=4.0.0",
-    "pyrender>=0.1.45",
-    "pillow>=10.0.0",
-    "numpy>=1.20.0",
-    "pytest>=7.0.0",
-    "black>=22.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0.0",
+    "cadquery>=2.3.0",
 ]
 
 [project.scripts]

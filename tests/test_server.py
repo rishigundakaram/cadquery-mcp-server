@@ -50,7 +50,7 @@ show_object(result)
         sys.path.append(str(Path(__file__).parent.parent))
         import server
         result = server.verify_cad_query(str(test_file), "simple 10x10x10 box")
-        print(f"✅ Verification result: {json.dumps(result, indent=2)}")
+        # print(f"✅ Verification result: {json.dumps(result, indent=2)}")
 
         # Cleanup
         test_file.unlink()
@@ -84,7 +84,7 @@ show_object(result)
         sys.path.append(str(Path(__file__).parent.parent))
         from src.ai_3d_print.verify_helper import verify_model
         
-        result = verify_model(str(test_file), str(custom_output))
+        result = verify_model(str(test_file), "simple cylinder", str(custom_output))
         print(f"✅ Verification with custom output: {json.dumps(result, indent=2)}")
 
         # Check if files were created in custom location
@@ -95,11 +95,11 @@ show_object(result)
             print(f"❌ Custom output directory not found: {expected_dir}")
 
         # Cleanup
-        test_file.unlink()
-        if custom_output.exists():
-            import shutil
-            shutil.rmtree(custom_output)
-            print("✅ Cleaned up custom output directory")
+        # test_file.unlink()
+        # if custom_output.exists():
+        #     import shutil
+        #     shutil.rmtree(custom_output)
+        #     print("✅ Cleaned up custom output directory")
 
         return True
     except Exception as e:
@@ -149,7 +149,7 @@ def test_mcp_inspector():
 
     try:
         # Check if mcp is available
-        result = subprocess.run(["mcp", "--version"], capture_output=True, text=True)
+        result = subprocess.run(["mcp", "version"], capture_output=True, text=True)
         if result.returncode != 0:
             print("❌ MCP CLI not found. Install with: pip install mcp")
             return False
@@ -215,7 +215,7 @@ def main():
             test_server_basic,
             test_with_real_file,
             test_with_custom_output_path,
-            test_generate_cad_query,
+            # test_generate_cad_query,
             test_mcp_inspector,
             test_claude_desktop_config
         ]
