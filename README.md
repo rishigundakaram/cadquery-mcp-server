@@ -20,7 +20,7 @@ uv sync
 uv sync --extra cad
 
 # Test the server
-uv run python tests/test_server.py
+uv run pytest tests/ -v
 
 # Run with MCP Inspector (interactive testing)
 uv run mcp dev server.py
@@ -121,14 +121,22 @@ show_object(result)  # Required for processing
 
 ### Testing
 ```bash
-# Test server functionality
-uv run python tests/test_server.py
+# Run tests with pytest
+uv run pytest tests/ -v
+
+# Run specific test files
+uv run pytest tests/test_server.py -v
+uv run pytest tests/test_openai_verifier.py -v
 
 # Interactive testing with MCP Inspector
 uv run mcp dev server.py
 
 # Run evaluations
 uv run python evaluations/evaluate_verify.py
+
+# Legacy test runner (for backwards compatibility)
+uv run python tests/test_server.py
+uv run python tests/test_openai_verifier.py
 ```
 
 ### Extending the Server
