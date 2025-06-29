@@ -22,7 +22,8 @@ dependencies = [
   "cadquery-cli",
   "transformers",
   "torch",
-  "mcp"
+  "mcp",
+  "openai>=1.93.0",
 ]
 
 [project.scripts]

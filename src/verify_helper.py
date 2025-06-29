@@ -4,10 +4,9 @@ import logging
 from pathlib import Path
 from typing import Any, Dict
 
-from .render_cad import load_cadquery_model, generate_stl, generate_png_views
+from .render_cad import generate_stl
 from .openai_verifier import verify_cad_with_vllm
-from .types import VerificationResult
-from .generate_png_views import generate_png_views_blender
+from .generate_png_views import generate_png_views_blender, VerificationResult 
 
 logger = logging.getLogger(__name__)
 

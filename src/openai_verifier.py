@@ -4,8 +4,7 @@ import base64
 import logging
 import os
 from pathlib import Path
-from typing import Dict, Any, List
-from .types import PNGPaths, VerificationResult
+from .generate_png_views import PNGPaths, VerificationResult
 
 import openai
 from pydantic import BaseModel

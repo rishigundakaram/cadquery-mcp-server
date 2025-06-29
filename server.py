@@ -15,7 +15,7 @@ import torch
 from mcp.server.fastmcp import FastMCP
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from src.verify_helper import verify_model
-from src.types import VerificationResult
+from src.generate_png_views import VerificationResult
 
 # Configure detailed logging for debugging
 log_file = Path(__file__).parent / "mcp_server.log"
