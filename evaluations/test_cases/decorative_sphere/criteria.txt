@@ -1,1 +1,0 @@
-decorative sphere with dimpled texture - 4cm radius main sphere with 12 dimples of 0.5cm radius spheres subtracted from surface, dimples distributed across top hemisphere, equatorial band, and bottom hemisphere for textural decoration

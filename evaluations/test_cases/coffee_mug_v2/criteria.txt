@@ -1,1 +1,0 @@
-coffee mug with curved handle - 9cm height, 7cm diameter, 0.5cm wall thickness, handle created using spline sweep from 6 control points positioned around mug exterior

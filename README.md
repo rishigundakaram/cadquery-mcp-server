@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server that provides CAD generation and verificat
 ## Features
 
 - **`verify_cad_query`** - Validates CAD-Query generated models against criteria
-- **`generate_cad_query`** - *(Stub implementation)* Generates CAD-Query Python scripts from descriptions
+- **`generate_cad_query`** - _(Stub implementation)_ Generates CAD-Query Python scripts from descriptions
 - **CAD-Query Integration** - Full CAD-Query support for parametric 3D modeling
 - **STL/STEP Export** - Direct export to 3D printing and CAD formats
 - **Visual Feedback** - SVG generation for model inspection
@@ -31,12 +31,15 @@ uv run mcp dev server.py
 Add this to your Claude Desktop configuration file:
 
 ### macOS
+
 Location: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ### Windows
+
 Location: `%APPDATA%/Claude/claude_desktop_config.json`
 
 ### Configuration
+
 ```json
 {
   "mcpServers": {
@@ -56,10 +59,12 @@ Location: `%APPDATA%/Claude/claude_desktop_config.json`
 Validates a CAD-Query generated model against specified criteria.
 
 **Parameters:**
+
 - `file_path` (string): Path to the CAD-Query Python file
 - `verification_criteria` (string): Description of what to verify
 
 **Example:**
+
 ```json
 {
   "file_path": "models/coffee_mug.py",
@@ -68,27 +73,30 @@ Validates a CAD-Query generated model against specified criteria.
 ```
 
 **Returns:**
+
 ```json
 {
   "status": "PASS" | "FAIL",
-  "message": "Description of result", 
+  "message": "Description of result",
   "file_path": "Path to verified file",
   "criteria": "Verification criteria used",
   "details": "Additional verification details"
 }
 ```
 
-### `generate_cad_query` *(Stub Implementation)*
+### `generate_cad_query` _(Stub Implementation)_
 
 Generates CAD-Query Python scripts from natural language descriptions.
 
 **NOTE**: Currently returns a stub response indicating the feature is not yet implemented.
 
 **Parameters:**
+
 - `description` (string): Natural language description of the desired 3D model
 - `parameters` (string, optional): Specific dimensions or constraints
 
 **Example:**
+
 ```json
 {
   "description": "Create a coffee mug with a handle, 10cm tall and 8cm diameter",
@@ -97,6 +105,7 @@ Generates CAD-Query Python scripts from natural language descriptions.
 ```
 
 **Returns:**
+
 ```json
 {
   "status": "NOT_IMPLEMENTED",
@@ -120,6 +129,7 @@ show_object(result)  # Required for processing
 ## Development
 
 ### Testing
+
 ```bash
 # Test server functionality
 uv run python tests/test_server.py
@@ -140,3 +150,20 @@ The current `verify_cad_query` implementation is a basic validator. You can enha
 - Analyze resulting geometry dimensions
 - Check for specific features and constraints
 - Generate detailed validation reports
+
+### Dev tools
+
+```
+# formatting
+uvx rff format
+
+```
+
+```
+# running the MCP server
+npx @modelcontextprotocol/inspector \
+  uv \
+  --directory $(pwd) \
+  run \
+  server.py
+```

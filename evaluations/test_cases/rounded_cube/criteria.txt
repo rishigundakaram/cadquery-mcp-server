@@ -1,1 +1,0 @@
-rounded cube with filleted edges - 5cm cubic base with 0.5cm radius fillets applied to all edges for smooth, rounded appearance while maintaining cubic proportions

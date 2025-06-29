@@ -1,1 +1,0 @@
-square pyramid using loft operation - 6cm x 6cm square base lofted to apex point 8 units above base, created using faces and loft between base square and tiny circle at top

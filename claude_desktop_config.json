@@ -1,11 +1,16 @@
 {
   "mcpServers": {
     "cad-verification": {
-      "command": "python",
+      "command": "/Users/rishigundakaram/.pyenv/shims/uv",
       "args": [
-        "/Users/rishigundakaram/Desktop/doodles/3d-print/cadquery-mcp-server/server.py"
+          "--directory",
+          "/Users/rishigundakaram/Desktop/doodles/3d-print/cadquery-mcp-server",
+          "run",
+          "server.py"
       ],
-      "env": {}
+      "env": {
+      }
     }
   }
 }
+

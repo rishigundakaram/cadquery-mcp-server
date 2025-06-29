@@ -1,13 +1,9 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "cadquery-mcp-server"
 version = "0.1.0"
 description = "MCP Server for CAD Verification with CadQuery"
 readme = "README.md"
-requires-python = ">=3.10,<3.11"
+requires-python = ">=3.11"
 authors = [
     {name = "CadQuery MCP Server"}
 ]
@@ -23,17 +19,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "mcp[cli]>=0.1.0",
-    "torch>=2.0.0",
-    "transformers>=4.30.0",
-    "openai>=1.0.0",
-    "pydantic>=2.0.0",
-    "numpy==1.26",
-    "pillow>=11.2.1",
-    "nptyping==1.4.4",
-    "trimesh>=4.6.12",
-    "pyrender>=0.1.45",
-    "cadquery>=2.3.0",
+  "cadquery-cli",
+  "mcp"
 ]
 
 [project.scripts]
@@ -98,6 +85,14 @@ warn_unused_ignores = true
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.uv]
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'arm64'"
+]
+
+[tool.uv.sources]
+cadquery-cli = { git = "https://github.com/CadQuery/cq-cli.git" }
 
 [dependency-groups]
 dev = [

@@ -29,18 +29,18 @@ def load_test_cases() -> dict[str, dict[str, str]]:
     for case_dir in test_cases_dir.iterdir():
         if not case_dir.is_dir():
             continue
-            
+
         model_file = case_dir / "model.py"
         criteria_file = case_dir / "criteria.txt"
         result_file = case_dir / "result.txt"
-        
+
         if all(f.exists() for f in [model_file, criteria_file, result_file]):
             test_cases[case_dir.name] = {
                 "model_path": str(model_file),
                 "criteria": criteria_file.read_text().strip(),
-                "expected": result_file.read_text().strip()
+                "expected": result_file.read_text().strip(),
             }
-    
+
     return test_cases
 
 
@@ -94,7 +94,9 @@ def generate_visual_outputs(model_file: Path, output_dir: Path) -> dict[str, str
     return outputs
 
 
-def run_single_test(test_name: str, test_data: dict[str, str], base_output_dir: Path) -> dict[str, Any]:
+def run_single_test(
+    test_name: str, test_data: dict[str, str], base_output_dir: Path
+) -> dict[str, Any]:
     """Run verification on a single test model."""
     model_file = Path(test_data["model_path"])
     print(f"📝 Testing: {test_name}")
@@ -104,22 +106,22 @@ def run_single_test(test_name: str, test_data: dict[str, str], base_output_dir: 
 
     # Run the verification using the server function
     result = server.verify_cad_query(test_data["model_path"], test_data["criteria"])
-    
+
     # Move generated outputs to the timestamped directory
     model_name = model_file.stem
     # Files are generated in evaluations/test_cases/outputs/model/ (always named "model")
     default_outputs_dir = Path(__file__).parent / "test_cases" / "outputs" / "model"
-    
+
     if default_outputs_dir.exists():
         # Create the model-specific directory in our timestamped output
         model_output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Move all files from default output to our timestamped directory
         for output_file in default_outputs_dir.iterdir():
             if output_file.is_file():
                 dest_file = model_output_dir / output_file.name
                 shutil.move(str(output_file), str(dest_file))
-        
+
         # Remove the empty default directory
         default_outputs_dir.rmdir()
 
@@ -156,7 +158,7 @@ def run_evaluation() -> tuple[dict[str, Any], Path]:
     """Run evaluation on all test models."""
     print("🚀 CAD Verification Evaluation Harness")
     print("=" * 50)
-    
+
     # Create timestamped output directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     base_output_dir = Path(__file__).parent / "test_outputs" / timestamp
@@ -189,11 +191,11 @@ def run_evaluation() -> tuple[dict[str, Any], Path]:
 
         if test_result["correct"]:
             correct_count += 1
-            
+
         # Calculate confusion matrix values
         expected = test_result["expected"]
         actual = test_result["actual"]
-        
+
         if expected == "PASS" and actual == "PASS":
             true_positives += 1
         elif expected == "FAIL" and actual == "FAIL":
@@ -202,17 +204,29 @@ def run_evaluation() -> tuple[dict[str, Any], Path]:
             false_positives += 1
         elif expected == "PASS" and actual == "FAIL":
             false_negatives += 1
-            
+
         total_count += 1
         print()  # Empty line for readability
 
     # Calculate metrics
     accuracy = (correct_count / total_count * 100) if total_count > 0 else 0
-    
+
     # Calculate precision, recall, F1
-    precision = (true_positives / (true_positives + false_positives)) if (true_positives + false_positives) > 0 else 0
-    recall = (true_positives / (true_positives + false_negatives)) if (true_positives + false_negatives) > 0 else 0
-    f1_score = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0
+    precision = (
+        (true_positives / (true_positives + false_positives))
+        if (true_positives + false_positives) > 0
+        else 0
+    )
+    recall = (
+        (true_positives / (true_positives + false_negatives))
+        if (true_positives + false_negatives) > 0
+        else 0
+    )
+    f1_score = (
+        (2 * precision * recall / (precision + recall))
+        if (precision + recall) > 0
+        else 0
+    )
 
     # Print summary
     print("📊 Evaluation Summary:")
@@ -225,7 +239,7 @@ def run_evaluation() -> tuple[dict[str, Any], Path]:
     print(f"Recall:         {recall:.3f}")
     print(f"F1 Score:       {f1_score:.3f}")
     print(f"Output Directory: {base_output_dir}")
-    
+
     # Print confusion matrix
     print("\n📋 Confusion Matrix:")
     print("=" * 20)
@@ -254,11 +268,11 @@ def run_evaluation() -> tuple[dict[str, Any], Path]:
             "true_positives": true_positives,
             "true_negatives": true_negatives,
             "false_positives": false_positives,
-            "false_negatives": false_negatives
+            "false_negatives": false_negatives,
         },
         "results": results,
     }
-    
+
     return evaluation_summary, base_output_dir
 
 

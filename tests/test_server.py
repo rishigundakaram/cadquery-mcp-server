@@ -19,6 +19,7 @@ def test_server_basic():
         # Test server import
         sys.path.append(str(Path(__file__).parent.parent))
         import server
+
         print("✅ Server imports successfully")
 
         # Test tool function directly
@@ -37,10 +38,10 @@ def test_with_real_file():
 
     # Create a simple test file
     test_file = Path("test_box.py")
-    test_content = '''import cadquery as cq
+    test_content = """import cadquery as cq
 result = cq.Workplane("XY").box(10, 10, 10)
 show_object(result)
-'''
+"""
 
     try:
         test_file.write_text(test_content)
@@ -49,6 +50,7 @@ show_object(result)
         # Test verification with default output
         sys.path.append(str(Path(__file__).parent.parent))
         import server
+
         result = server.verify_cad_query(str(test_file), "simple 10x10x10 box")
         # print(f"✅ Verification result: {json.dumps(result, indent=2)}")
 
@@ -70,10 +72,10 @@ def test_with_custom_output_path():
 
     # Create a simple test file
     test_file = Path("test_cylinder.py")
-    test_content = '''import cadquery as cq
+    test_content = """import cadquery as cq
 result = cq.Workplane("XY").cylinder(5, 20)
 show_object(result)
-'''
+"""
 
     try:
         test_file.write_text(test_content)
@@ -83,7 +85,7 @@ show_object(result)
         custom_output = Path("custom_outputs")
         sys.path.append(str(Path(__file__).parent.parent))
         from src.ai_3d_print.verify_helper import verify_model
-        
+
         result = verify_model(str(test_file), "simple cylinder", str(custom_output))
         print(f"✅ Verification with custom output: {json.dumps(result, indent=2)}")
 
@@ -110,6 +112,7 @@ show_object(result)
         custom_output = Path("custom_outputs")
         if custom_output.exists():
             import shutil
+
             shutil.rmtree(custom_output)
         return False
 
@@ -126,9 +129,13 @@ def test_generate_cad_query():
         result = server.generate_cad_query("simple box", "10x10x10 mm")
         print(f"✅ Generation result status: {result['status']}")
 
-        if result['status'] == 'SUCCESS':
+        if result["status"] == "SUCCESS":
             print("✅ Generated code preview:")
-            print(result['generated_code'][:200] + "..." if len(result['generated_code']) > 200 else result['generated_code'])
+            print(
+                result["generated_code"][:200] + "..."
+                if len(result["generated_code"]) > 200
+                else result["generated_code"]
+            )
         else:
             print(f"⚠️  Generation failed: {result['message']}")
 
@@ -158,7 +165,9 @@ def test_mcp_inspector():
         print("\n📋 To test interactively, run:")
         print("   mcp dev server.py")
         print("\nThen test the verify_cad_query tool with:")
-        print('   {"file_path": "examples/box.py", "verification_criteria": "simple box"}')
+        print(
+            '   {"file_path": "examples/box.py", "verification_criteria": "simple box"}'
+        )
 
         return True
     except Exception as e:
@@ -179,7 +188,7 @@ def test_claude_desktop_config():
                 "cad-verification": {
                     "command": "python",
                     "args": [str(abs_server_path)],
-                    "env": {}
+                    "env": {},
                 }
             }
         }
@@ -189,7 +198,9 @@ def test_claude_desktop_config():
 
         print(f"✅ Generated config file: {config_file}")
         print("📋 Copy this to your Claude Desktop config location:")
-        print("   macOS: ~/Library/Application Support/Claude/claude_desktop_config.json")
+        print(
+            "   macOS: ~/Library/Application Support/Claude/claude_desktop_config.json"
+        )
         print("   Windows: %APPDATA%/Claude/claude_desktop_config.json")
 
         return True
@@ -208,6 +219,7 @@ def main():
 
     try:
         import os
+
         os.chdir(project_dir)
         print(f"📁 Working directory: {project_dir}")
 
@@ -217,7 +229,7 @@ def main():
             test_with_custom_output_path,
             # test_generate_cad_query,
             test_mcp_inspector,
-            test_claude_desktop_config
+            test_claude_desktop_config,
         ]
 
         passed = 0

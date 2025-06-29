@@ -1,1 +1,0 @@
-triangular-toothed gear with 32 teeth - 1 unit diameter (0.5 unit radius), 0.05 unit tooth depth, 0.1 unit thickness, triangular teeth with precise angular spacing, center hole with 0.05 unit radius

@@ -1,1 +1,1 @@
-"""CAD verification package."""
+"""3D printing verification utilities."""

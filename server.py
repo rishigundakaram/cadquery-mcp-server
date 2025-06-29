@@ -14,17 +14,18 @@ from typing import Any
 import torch
 from mcp.server.fastmcp import FastMCP
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from src.ai_3d_print.verify_helper import verify_model
+from src.verify_helper import verify_model
+from src.types import VerificationResult
 
 # Configure detailed logging for debugging
-log_file = Path(__file__).parent / 'mcp_server.log'
+log_file = Path(__file__).parent / "mcp_server.log"
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(sys.stderr),
-        logging.FileHandler(log_file, mode='a')
-    ]
+        logging.FileHandler(log_file, mode="a"),
+    ],
 )
 logger = logging.getLogger(__name__)
 
@@ -35,26 +36,26 @@ mcp = FastMCP("CAD Verification Server")
 model = None
 tokenizer = None
 
+
 def load_model():
     """Load the HuggingFace model for code generation"""
     global model, tokenizer
     try:
         logger.info("Loading HuggingFace model: ricemonster/codegpt-small-sft")
-        
+
         # Load tokenizer with original inference settings
         tokenizer = AutoTokenizer.from_pretrained(
             "ricemonster/codegpt-small-sft",
             trust_remote_code=True,
             use_fast=False,
-            model_max_length=1024
+            model_max_length=1024,
         )
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.padding_side = "left"
-        
+
         # Load model with original inference settings
         model = AutoModelForCausalLM.from_pretrained(
-            "ricemonster/codegpt-small-sft",
-            trust_remote_code=True
+            "ricemonster/codegpt-small-sft", trust_remote_code=True
         )
         model.eval()
 
@@ -64,6 +65,7 @@ def load_model():
         logger.error(f"Failed to load model: {e}")
         return False
 
+
 # Model will be loaded lazily when first needed
 
 
@@ -71,10 +73,10 @@ def load_model():
 def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, Any]:
     """
     Verify a CAD-Query generated model against specified criteria.
-    
+
     This tool generates STL files and PNG views (right, top, down, iso) of the model
     and validates it against the specified criteria.
-    
+
     Args:
         file_path: Path to the CAD-Query Python file to verify
         verification_criteria: Description of what aspects to verify
@@ -86,28 +88,22 @@ def verify_cad_query(file_path: str, verification_criteria: str) -> dict[str, An
     logger.info("🔍 MCP Tool Called: verify_cad_query")
     logger.info(f"📁 File path: {file_path}")
     logger.info(f"📋 Verification criteria: {verification_criteria}")
-    
+
     try:
         # Use the actual verification implementation with criteria
         result = verify_model(file_path, criteria=verification_criteria)
-        
-        # Add the verification criteria to the result
-        result["criteria"] = verification_criteria
-        
-        logger.info(f"✅ Verification result: {result['status']}")
-        
-        return result
-        
+
+        logger.info(f"✅ Verification result: {result.status}")
+
+        return result.model_dump()
+
     except Exception as e:
-        logger.error(f"❌ Verification failed with exception: {e}")
-        return {
-            "status": "FAIL",
-            "message": f"Verification failed due to unexpected error: {e}",
-            "file_path": file_path,
-            "criteria": verification_criteria,
-            "details": [],
-            "errors": [f"Unexpected error: {e}"]
-        }
+        logger.error(f"❌ Verification failed with exception: {e}", exc_info=True)
+        return VerificationResult(
+            status="FAIL",
+            reasoning=f"Verification failed due to unexpected error: {e}",
+            criteria=verification_criteria,
+        ).model_dump()
 
 
 @mcp.tool()
@@ -144,16 +140,18 @@ def generate_cad_query(description: str, parameters: str = "") -> dict[str, Any]
                 "message": "Failed to load model. Please check server logs.",
                 "description": description,
                 "parameters": parameters,
-                "generated_code": None
+                "generated_code": None,
             }
 
     try:
         # Combine description and parameters for input
         full_prompt = f"{description} {parameters}".strip()
-        
+
         # Tokenize input directly from description
-        inputs = tokenizer(full_prompt, return_tensors="pt", padding=True, truncation=True)
-        
+        inputs = tokenizer(
+            full_prompt, return_tensors="pt", padding=True, truncation=True
+        )
+
         # Calculate max_new_tokens dynamically like original inference
         input_lengths = inputs["input_ids"].shape[1]
         max_new_tokens = max(1, 1024 - input_lengths)
@@ -165,7 +163,7 @@ def generate_cad_query(description: str, parameters: str = "") -> dict[str, Any]
                 max_new_tokens=max_new_tokens,
                 eos_token_id=tokenizer.eos_token_id,
                 pad_token_id=tokenizer.eos_token_id,
-                do_sample=False
+                do_sample=False,
             )
 
         # Decode generated text
@@ -176,7 +174,7 @@ def generate_cad_query(description: str, parameters: str = "") -> dict[str, Any]
             "message": "CAD code generated successfully",
             "description": description,
             "parameters": parameters,
-            "generated_code": generated_code
+            "generated_code": generated_code,
         }
 
         logger.info(f"✅ Generation result: {result['status']}")
@@ -189,10 +187,10 @@ def generate_cad_query(description: str, parameters: str = "") -> dict[str, Any]
             "message": f"Error generating CAD code: {str(e)}",
             "description": description,
             "parameters": parameters,
-            "generated_code": None
+            "generated_code": None,
         }
 
 
 if __name__ == "__main__":
     # Run the server
-    mcp.run()
+    mcp.run(transport="stdio")

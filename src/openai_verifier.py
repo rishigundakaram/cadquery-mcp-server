@@ -5,6 +5,7 @@ import logging
 import os
 from pathlib import Path
 from typing import Dict, Any, List
+from .types import PNGPaths, VerificationResult
 
 import openai
 from pydantic import BaseModel
@@ -12,8 +13,9 @@ from pydantic import BaseModel
 logger = logging.getLogger(__name__)
 
 
-class VerificationResult(BaseModel):
+class StructuredVerificationResult(BaseModel):
     """Simple structured output for CAD verification."""
+
     result: str  # "PASS" or "FAIL"
     analysis: str  # Detailed reasoning
 
@@ -21,34 +23,36 @@ class VerificationResult(BaseModel):
 def encode_image_to_base64(image_path: Path) -> str:
     """Convert PNG image to base64 string for OpenAI API."""
     with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+        return base64.b64encode(image_file.read()).decode("utf-8")
 
 
-def verify_cad_with_openai(png_files: Dict[str, str], criteria: str) -> Dict[str, Any]:
+def verify_cad_with_vllm(png_files: PNGPaths, criteria: str) -> VerificationResult:
     """
     Verify CAD model using OpenAI o3-mini with structured outputs.
-    
+
     Args:
         png_files: Dictionary mapping view names to file paths
         criteria: Verification criteria string
-    
+
     Returns:
         Dictionary containing verification result and analysis
     """
     client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    
+
     # Prepare image content for the API
     image_content = []
-    for view_name, file_path in png_files.items():
+    # Iterate through PNGPaths model attributes
+    for view, file_path in png_files.model_dump().items():
         if Path(file_path).exists():
             base64_image = encode_image_to_base64(Path(file_path))
-            image_content.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/png;base64,{base64_image}"
+            image_content.append({"type": "text", "text": f"View: {view}"})
+            image_content.append(
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/png;base64,{base64_image}"},
                 }
-            })
-    
+            )
+
     # Create the prompt
     prompt = f"""
     Analyze these 3D CAD model images and verify if they meet the following criteria:
@@ -63,29 +67,22 @@ def verify_cad_with_openai(png_files: Dict[str, str], criteria: str) -> Dict[str
     
     Be thorough in explaining your reasoning, including specific measurements, shapes, features, and any discrepancies you notice.
     """
-    
+
     # Prepare messages
     messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": prompt},
-                *image_content
-            ]
-        }
+        {"role": "user", "content": [{"type": "text", "text": prompt}, *image_content]}
     ]
-    
+
     # Call OpenAI API with structured output
     response = client.beta.chat.completions.parse(
-        model="o4-mini",
-        messages=messages,
-        response_format=VerificationResult
+        model="o4-mini", messages=messages, response_format=StructuredVerificationResult
     )
-    
+
     # Extract the structured result
     verification_result = response.choices[0].message.parsed
-    
-    return {
-        "result": verification_result.result,
-        "analysis": verification_result.analysis
-    }
+
+    return VerificationResult(
+        status=verification_result.result,
+        reasoning=verification_result.analysis,
+        criteria=criteria,
+    )
