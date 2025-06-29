@@ -11,7 +11,7 @@ from .generate_png_views import generate_png_views_blender, VerificationResult
 logger = logging.getLogger(__name__)
 
 
-def verify_model(
+async def verify_model(
     file_path: str, criteria: str = None, output_path: str = None
 ) -> VerificationResult:
     """
@@ -44,10 +44,11 @@ def verify_model(
     # Generate STL file directly from script
     try:
         stl_path = outputs_dir / f"{file_name}.stl"
-        if not generate_stl(script_path, stl_path):
+        success, error_msg = generate_stl(script_path, stl_path)
+        if not success:
             return VerificationResult(
                 status="FAIL",
-                reasoning="Failed to generate STL file from CAD script",
+                reasoning=f"CadQuery compilation failed: {error_msg}" if error_msg else "Failed to generate STL file from CAD script",
                 criteria=criteria,
             )
         logger.info(f"STL file generated: {stl_path}")
@@ -72,14 +73,16 @@ def verify_model(
             criteria=criteria,
         )
 
-    # Add PNG file paths to result
+    # Verify with OpenAI
     try:
-        openai_result = verify_cad_with_vllm(png_results, criteria)
+        logger.info("Starting OpenAI verification...")
+        openai_result = await verify_cad_with_vllm(png_results, criteria)
+        logger.info(f"OpenAI verification completed with status: {openai_result.status}")
+        return openai_result
     except Exception as e:
-        logger.error(f"Failed to verify CAD model: {e}", exc_info=True)
+        logger.error(f"Failed to verify CAD model with OpenAI: {e}", exc_info=True)
         return VerificationResult(
             status="FAIL",
-            reasoning=f"Failed to add PNG file paths to result: {e}",
+            reasoning=f"Failed to verify with OpenAI: {e}",
             criteria=criteria,
         )
-    return openai_result
