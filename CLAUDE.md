@@ -11,7 +11,16 @@ uv sync --extra cad
 
 ### Test MCP Server Functionality
 ```bash
+# Run tests with pytest (recommended)
+uv run pytest tests/ -v
+
+# Run specific test files
+uv run pytest tests/test_server.py -v
+uv run pytest tests/test_openai_verifier.py -v
+
+# Legacy test runner (for backwards compatibility)
 uv run python tests/test_server.py
+uv run python tests/test_openai_verifier.py
 ```
 
 ### Test with MCP Inspector (Interactive)
