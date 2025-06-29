@@ -6,7 +6,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-def generate_stl(script_path: Path, output_path: Path) -> bool:
+def generate_stl(script_path: Path, output_path: Path) -> tuple[bool, str]:
     """
     Generate STL file from CAD-Query script.
 
@@ -15,7 +15,7 @@ def generate_stl(script_path: Path, output_path: Path) -> bool:
         output_path: Path where STL file should be saved
 
     Returns:
-        bool: True if successful, False otherwise
+        tuple: (success: bool, error_message: str)
     """
     try:
         # Ensure output directory exists
@@ -24,7 +24,8 @@ def generate_stl(script_path: Path, output_path: Path) -> bool:
         # Use cq-cli to convert CAD-Query script to STL
         import subprocess
         result = subprocess.run([
-            "cq-cli", 
+            "/Users/rishigundakaram/.pyenv/shims/uv",
+            "run", "-m", "cq_cli.main",
             "--codec", "stl",
             "--infile", str(script_path),
             "--outfile", str(output_path),
@@ -32,14 +33,15 @@ def generate_stl(script_path: Path, output_path: Path) -> bool:
         
         if result.returncode == 0:
             logger.info(f"STL generated successfully: {output_path}")
-            return True
+            return True, ""
         else:
+            error_msg = f"CadQuery compilation failed:\n{result.stderr}\n{result.stdout}".strip()
             logger.error(f"cq-cli execution failed: {result.stderr}")
             logger.error(f"cq-cli stdout: {result.stdout}")
-            return False
+            return False, error_msg
 
     except Exception as e:
-        logger.error(f"Failed to generate STL: {e}. If the error is a timeout, most likely the \
-        geometry is invalid. ")
-        return False
+        error_msg = f"Failed to generate STL: {e}. If the error is a timeout, most likely the geometry is invalid."
+        logger.error(error_msg)
+        return False, error_msg
 
